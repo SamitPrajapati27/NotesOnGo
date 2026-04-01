@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-
+import { Icon } from '@iconify/react';
 type SearchBarProps = {
   onSearch: (query: string) => void;
 };
@@ -22,19 +22,7 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
   return (
     <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700">
       {/* Search icon */}
-      <svg
-        className="w-4 h-4 text-neutral-400 shrink-0"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"
-        />
-      </svg>
+      <Icon icon="material-symbols:search-rounded"/>
 
       {/* Text input */}
       <input
