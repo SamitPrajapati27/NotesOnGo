@@ -1,20 +1,20 @@
 import { Icon } from "@iconify/react";
-type props = {
-  icon: string;
-  action?: () => void;
-  tooltip: string;
-  type?: string;
-};
+import { ButtonObject } from "../../types/Button";
 
-export default function Button({ icon, action, tooltip, type }: props) {
+export default function Button({
+  icon,
+  text,
+  action,
+  tooltip,
+  type,
+}: ButtonObject) {
   return (
     <div className="relative inline-block font-sans">
       <button
-        className="peer p-1 rounded-md hover:bg-gray-100"
+       className={"peer p-1 rounded-md hover:bg-gray-100 " + (type === "last" ? "border-r-2 rounded-none! border-zinc-200" : "")}
         onClick={action ?? (() => {})}>
-        <Icon icon={icon} />
+        {icon && <Icon icon={icon ?? "material-symbols:error"} />}
       </button>
-
       <div
         className="
         absolute left-1/2 -translate-x-1/2 mt-2

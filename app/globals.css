@@ -4,6 +4,7 @@
   --theme-main-bg: #fafafa;
   --theme-main-color: #171717;
   --theme-main-radius: var(--radius-md);
+  --theme-border-color: var(--color-zinc-200)
 }
 
 @theme inline {
@@ -11,6 +12,7 @@
   --color-foreground: var(--theme-main-color);
   --font-sans: var(--font-ibm-serif);
   --font-mono: var(--font-gamja);
+  --color-border: var(--theme-border-color);
 }
 
 body {
