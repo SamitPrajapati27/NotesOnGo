@@ -4,15 +4,13 @@ import { DropdownData } from "../types/DropButton";
  * This is for testing the types 
  * @param text 
  * @param icon 
- * @pram tooltip
  * @param action 
  * @returns 
  */
-export function ezCreateDDD(tooltip: string,icon?: string, text?: string): DropdownData {
+export function ezCreateDDD(text: string, icon: string): DropdownData {
   const newData: DropdownData = {
-    text: text || tooltip,
+    text,
     icon,
-    tooltip
   };
 
   return newData;
