@@ -1,0 +1,76 @@
+@import "tailwindcss";
+@import "./globals.css";
+
+.btn {
+  @apply p-1 rounded-md transition-colors duration-150 border border-transparent hover:bg-accent cursor-pointer;
+}
+
+
+.btn-last {
+  @apply border-r-2 rounded-none border-zinc-200;
+}
+
+.btn-half {
+  @apply rounded-l-md;
+}
+
+.btn-radio {
+  @apply rounded-full border border-zinc-200 bg-white;
+}
+
+.btn-display {
+  @apply rounded-2xl text-black;
+}
+
+.tooltip {
+  @apply absolute z-10 whitespace-nowrap rounded bg-black text-white text-sm px-1 py-0.5;
+}
+
+.tooltip-up {
+  @apply left-1/2 -translate-x-1/2 mb-2 bottom-full;
+}
+
+.tooltip-down {
+  @apply left-1/2 -translate-x-1/2 mt-2 top-full;
+}
+
+.tooltip-left {
+  @apply right-full mr-2 top-1/2 -translate-y-1/2;
+}
+
+.tooltip-right {
+  @apply left-full ml-2 top-1/2 -translate-y-1/2;
+}
+
+.tooltip::after {
+  content: "";
+  position: absolute;
+  width: 0.35rem;
+  height: 0.35rem;
+  background: #000;
+  transform: rotate(45deg);
+}
+
+.tooltip-down::after {
+  top: -0.125rem;
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.tooltip-up::after {
+  bottom: -0.125rem;
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.tooltip-left::after {
+  right: -0.125rem;
+  top: 50%;
+  transform: translateY(-50%) rotate(45deg);
+}
+
+.tooltip-right::after {
+  left: -0.125rem;
+  top: 50%;
+  transform: translateY(-50%) rotate(45deg);
+}
