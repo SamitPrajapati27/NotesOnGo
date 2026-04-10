@@ -1,40 +1,53 @@
-import { useState } from "react";
 import { DropdownObject } from "@/src/types/DropButton";
-import Button from "./Button"; // adjust path as needed
-
-export default function DropButton({ icon, text, tooltip, data }: DropdownObject) {
-  const [toggle, setToggle] = useState(false);
-
-  // Local state to track the currently selected icon
-  const [currentIcon, setCurrentIcon] = useState<string | undefined>(icon);
-
-  const handleToggle = () => setToggle((prev) => !prev);
-
-  // Handle clicking a dropdown item
-  const handleSelect = (itemIcon: string) => {
-    setCurrentIcon(itemIcon);
-    setToggle(false); 
+import Button from "./Button";
+import { useState } from "react";
+export default function DropButton({
+  icon,
+  text,
+  tooltip,
+  data,
+  isOpen = false,
+  onToggle,
+  id = "",
+}: DropdownObject) {
+  const handleToggle = () => {
+    if (onToggle) {
+      onToggle(isOpen ? "" : id);
+    }
   };
-
+  const [displayIcon, setDisplayIcon] = useState<string | undefined>(icon);
+  const [displayText, setDisplayText] = useState<string | undefined>(text);
+  const handleItemClick = (item: typeof data[0]) => {
+    if (item.icon) {
+      setDisplayIcon(item.icon);
+      setDisplayText(undefined);
+    } else if (item.text) {
+      setDisplayIcon(undefined);
+      setDisplayText(item.text);
+    }
+    if (onToggle) {
+      onToggle("");
+    }
+  }
   return (
-    <div className="relative inline-block">
-      {/* Main Button */}
+    <div className="relative inline-block z-10">
       <Button
-        icon={currentIcon}
-        text={text ?? "btn"}
+        icon={displayIcon}
+        text={displayText ?? "btn"}
         action={handleToggle}
         tooltip={tooltip}
+        type={isOpen ? "dropdown-open" : "dropdown"}
       />
-
-      {/* Dropdown List */}
-      {toggle && (
-        <ul className="absolute bg-white">
+      {isOpen && (
+        <ul className="absolute bg-white border border-border rounded-lg mt-2 text-center">
           {data.map((item, index) => (
             <li key={index}>
               <Button
                 icon={item.icon}
-                action={() => handleSelect(item.icon)}
-                tooltip={item.text}
+                text={item.text}
+                action={() => handleItemClick(item)}
+                tooltip={item.tooltip}
+                position="right"
               />
             </li>
           ))}

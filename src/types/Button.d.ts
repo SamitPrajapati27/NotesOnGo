@@ -3,5 +3,6 @@ export type ButtonObject = {
   text?: string;
   action?: () => void;
   tooltip: string;
-  type?: string;
+  type?: 'normal' | 'last' | 'dropdown' | 'dropdown-open';
+  position?: 'up' | 'down' | 'left' | 'right';
 };

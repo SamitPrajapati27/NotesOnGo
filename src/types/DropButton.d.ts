@@ -1,6 +1,7 @@
 export type DropdownData = {
-  text: string;
-  icon: string;
+  text?: string;
+  icon?: string;
+  tooltip: string;
 };
 
 export type DropdownObject = {
@@ -8,4 +9,7 @@ export type DropdownObject = {
   text?: string;
   tooltip: string;
   data: Array<DropdownData>;
+  isOpen?: boolean;
+  onToggle?: (id: string) => void;
+  id?: string;
 };
