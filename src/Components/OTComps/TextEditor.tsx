@@ -16,7 +16,7 @@ export default function TextEditor() {
   return (
     <div className="size-200 mt-10 relative">
       <textarea
-        className="size-full appearance-none bg-primary-bg border-border border rounded-lg resize-none p-2 focus:outline-none focus:ring-0"
+        className="size-full appearance-none bg-primary-bg border-border border border-primary-border rounded-lg resize-none p-2 focus:outline-none focus:ring-0"
         value={text}
         onChange={(e) => setText(e.target.value)}
         placeholder="Type your Note"

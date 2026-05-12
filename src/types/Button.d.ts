@@ -5,4 +5,5 @@ export type ButtonObject = {
   tooltip: string;
   type?: 'normal' | 'last' | 'dropdown' | 'dropdown-open';
   position?: 'up' | 'down' | 'left' | 'right';
+  extra?: string;
 };

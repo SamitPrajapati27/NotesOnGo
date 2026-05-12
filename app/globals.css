@@ -30,3 +30,9 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+.dark {
+  --primary-bg: var(--color-zinc-600);
+  background: var(--color-zinc-800);
+  color: white;
+  --primary-border: var(--color-zinc-600);
+}

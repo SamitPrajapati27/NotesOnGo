@@ -9,6 +9,7 @@ export default function Button({
   tooltip,
   type,
   position = "down",
+  extra
 }: ButtonObject) {
   const endIcon =
     type === "dropdown"
@@ -16,10 +17,9 @@ export default function Button({
       : type === "dropdown-open"
         ? "material-symbols:arrow-drop-up-rounded"
         : undefined;
-
   return (
     <div className="relative inline-block font-sans">
-      <button className={`btn peer text-sm`} onClick={action ?? (() => {})}>
+      <button className={`btn peer text-sm ` + extra} onClick={action ?? (() => {})}>
         <div className="flex items-center gap-1">
           {icon ? (
             <Icon icon={icon ?? "material-symbols:error"} />

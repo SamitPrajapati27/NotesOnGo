@@ -45,17 +45,23 @@ export default function Toolbar() {
   return (
     <div
       ref={toolbarRef}
-      className="p-1 rounded-md border-primary-border border divide-x divide-primary-border size-fit mx-auto mt-2 flex items-center justify-between ">
+      className="p-1 rounded-md bg-primary-bg border-primary-border border divide-x divide-primary-border size-fit mx-auto mt-2 flex items-center justify-between ">
       <div className="">
         <Button
           icon="material-symbols:format-bold-rounded"
-          action={() => console.log("Bold")}
+          action={() => {
+            const text: string = "";
+            return "<B>" + text + "</B>"
+          }}
           type="normal"
           tooltip="bold"
         />
         <Button
           icon="material-symbols:format-italic-rounded"
-          action={() => console.log("Italic")}
+          action={() => {
+            const text: string = "";
+            return "<i>" + text + "</i>"
+          }}
           type="normal"
           tooltip="italic"
         />
