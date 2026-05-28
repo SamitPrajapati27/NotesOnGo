@@ -1,5 +1,5 @@
 import { Icon } from "@iconify/react";
-import { ButtonObject } from "../../types/Button";
+import { ButtonObject } from "../../types/BasicTypes";
 import "../../../app/ButtonStyle.css";
 
 export default function Button({
@@ -9,7 +9,7 @@ export default function Button({
   tooltip,
   type,
   position = "down",
-  extra
+  extra,
 }: ButtonObject) {
   const endIcon =
     type === "dropdown"
@@ -19,19 +19,21 @@ export default function Button({
         : undefined;
   return (
     <div className="relative inline-block font-sans">
-      <button className={`btn peer text-sm ` + extra} onClick={action ?? (() => {})}>
+      <button
+        className={`btn peer text-sm ` + extra}
+        onClick={action ?? (() => {})}>
         <div className="flex items-center gap-1">
           {icon ? (
             <Icon icon={icon ?? "material-symbols:error"} />
           ) : (
-            text && <span className="">{text}</span>
+            text && <span className="mx-auto">{text}</span>
           )}
           {endIcon && <Icon icon={endIcon} />}
         </div>
       </button>
       <div
         data-position={position}
-        className={`tooltip tooltip-${position} hidden scale-95 transition-all duration-150 peer-hover:block peer-hover:scale-100`}>
+        className={`tooltip tooltip-${position} z-50 hidden scale-95 transition-all ease-in-out duration-500 peer-hover:block peer-hover:scale-100`}>
         {tooltip}
       </div>
     </div>

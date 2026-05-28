@@ -3,7 +3,6 @@ export default async function NotePage({ params }: { params: Promise<{ page: str
 
   return (
     <div>
-      {/* Note page for: {page} */}
     </div>
   )
 }

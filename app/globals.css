@@ -6,6 +6,7 @@
   --theme-main-radius: var(--radius-md);
   --theme-border-color: var(--color-zinc-200);
   --primary-bg: #f8f9fb;
+  --secondary-bg: #fafaf9;
   --primary-border: #e5e7eb;
   --accent: #c4b5fd;
   --dark-primary-bg: #6b7280;
@@ -19,6 +20,7 @@
   --font-mono: var(--font-gamja);
   --color-border: var(--theme-border-color);
   --color-primary-bg: var(--primary-bg);
+  --color-secondary-bg: var(--secondary-bg);
   --color-primary-border: var(--primary-border);
   --color-accent: var(--accent);
   --color-dark-primary-bg: var(--dark-primary-bg);
@@ -35,4 +37,26 @@ body {
   background: var(--color-zinc-800);
   color: white;
   --primary-border: var(--color-zinc-600);
+}
+.popup{
+  @apply flex w-full justify-between rounded-lg border border-primary-border p-4 overflow-hidden;
+}
+.popup-row {
+  @apply bg-zinc-100 ;
+}
+
+.popup-row:nth-child(2) {
+  @apply bg-zinc-200 ;
+}
+
+.popup-row:nth-child(3) {
+  @apply bg-zinc-300 ;
+}
+
+.popup-row:nth-child(4) {
+  @apply bg-zinc-400 ;
+}
+
+.popup-row:nth-child(5) {
+  @apply bg-zinc-500;
 }

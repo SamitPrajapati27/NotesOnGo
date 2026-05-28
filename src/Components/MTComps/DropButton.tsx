@@ -1,4 +1,4 @@
-import { DropdownObject } from "@/src/types/DropButton";
+import { DropdownObject } from "@/src/types/BasicTypes";
 import Button from "./Button";
 import { useState } from "react";
 export default function DropButton({
@@ -9,6 +9,7 @@ export default function DropButton({
   isOpen = false,
   onToggle,
   id = "",
+  pos
 }: DropdownObject) {
   const handleToggle = () => {
     if (onToggle) {
@@ -17,7 +18,7 @@ export default function DropButton({
   };
   const [displayIcon, setDisplayIcon] = useState<string | undefined>(icon);
   const [displayText, setDisplayText] = useState<string | undefined>(text);
-  const handleItemClick = (item: typeof data[0]) => {
+  const handleItemClick = (item: (typeof data)[0]) => {
     if (item.icon) {
       setDisplayIcon(item.icon);
       setDisplayText(undefined);
@@ -25,17 +26,19 @@ export default function DropButton({
       setDisplayIcon(undefined);
       setDisplayText(item.text);
     }
+    item.action();
     if (onToggle) {
       onToggle("");
     }
-  }
+  };
   return (
-    <div className="relative inline-block z-10">
+    <div className="relative inline-block z-50">
       <Button
         icon={displayIcon}
         text={displayText ?? "btn"}
         action={handleToggle}
         tooltip={tooltip}
+        position={pos? pos : "down"}
         type={isOpen ? "dropdown-open" : "dropdown"}
       />
       {isOpen && (
@@ -47,7 +50,7 @@ export default function DropButton({
                 text={item.text}
                 action={() => handleItemClick(item)}
                 tooltip={item.tooltip}
-                position="right"
+                position={pos? pos : "right"}
               />
             </li>
           ))}

@@ -1,57 +1,48 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
+import { useSlate,ReactEditor } from "slate-react";
 import Button from "@/src/Components/MTComps/Button";
-import { ezCreateDDD } from "@/src/scripts/TypeFactories";
-import { DropdownData } from "@/src/types/DropButton";
 import DropButton from "@/src/Components/MTComps/DropButton";
-
+import { Editor, Transforms } from "slate";
+import { isMarkActive,isBlockActive } from "@/src/scripts/engine";
+import {TBListDDD,TBHeadDDD,TBFontsDDD} from "@/src/scripts/setup";
 export default function Toolbar() {
   const [openDropdown, setOpenDropdown] = useState<string>("");
   const toolbarRef = useRef<HTMLDivElement>(null);
+  const editor = useSlate();
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        toolbarRef.current &&
-        !toolbarRef.current.contains(event.target as Node)
-      ) {
-        setOpenDropdown("");
-      }
-    };
+  const toggleMark = (format: string) => {
+    const isActive = isMarkActive(editor, format);
+    const selection = editor.selection;
+    if (isActive) {
+      Editor.removeMark(editor, format);
+    } else {
+      Editor.addMark(editor, format, true);
+    }
+    Transforms.select(editor, selection);
+    ReactEditor.focus(editor)
+  };
+  const toggleBlock = (format: string) => {
+    const isActive = isBlockActive(editor, format);
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
-  const dropdownListIcons = [
-    ["material-symbols:format-list-bulleted-rounded", "bullet"],
-    ["material-symbols:format-list-numbered-rounded", "number"],
-    ["material-symbols:checklist-rounded", "checklist"],
-  ];
-  const dropdownList: DropdownData[] = dropdownListIcons.map((icon) =>
-    ezCreateDDD(icon[1], icon[0], undefined),
-  );
-  const headingTexts = ["Heading 1", "Heading 2", "Heading 3"];
-  const headingList: DropdownData[] = headingTexts.map((text) =>
-    ezCreateDDD(text, undefined, text),
-  );
-  const fontsTexts = ["Default", "Elegant", "Fun"];
-  const fontsList: DropdownData[] = fontsTexts.map((font) =>
-    ezCreateDDD(font, undefined, font),
-  );
-  console.log(fontsList);
+    Transforms.setNodes(
+      editor,
+      {
+        type: isActive ? "paragraph" : format,
+      },
+      {
+        match: (n) => Editor.isBlock(editor, n),
+      },
+    );
+  };
   return (
     <div
-      ref={toolbarRef}
       className="p-1 rounded-md bg-primary-bg border-primary-border border divide-x divide-primary-border size-fit mx-auto mt-2 flex items-center justify-between ">
       <div className="">
         <Button
           icon="material-symbols:format-bold-rounded"
           action={() => {
-            const text: string = "";
-            return "<B>" + text + "</B>"
+            toggleMark("bold");
           }}
           type="normal"
           tooltip="bold"
@@ -59,40 +50,39 @@ export default function Toolbar() {
         <Button
           icon="material-symbols:format-italic-rounded"
           action={() => {
-            const text: string = "";
-            return "<i>" + text + "</i>"
+            toggleMark("italic");
           }}
           type="normal"
           tooltip="italic"
         />
         <Button
           icon="material-symbols:format-underlined-rounded"
-          action={() => console.log("Underline")}
+          action={() => toggleMark("underline")}
           type="normal"
           tooltip="underline"
         />
       </div>
       <DropButton
         id="headings"
-        text={headingTexts[0]}
+        text={"Heading 1"}
         tooltip="headings"
-        data={headingList}
+        data={TBHeadDDD}
         isOpen={openDropdown === "headings"}
         onToggle={setOpenDropdown}
       />
       <DropButton
         id="fonts"
-        text={fontsTexts[0]}
+        text={"Default"}
         tooltip="fonts"
-        data={fontsList}
+        data={TBFontsDDD}
         isOpen={openDropdown === "fonts"}
         onToggle={setOpenDropdown}
       />
       <DropButton
         id="lists"
-        icon={dropdownListIcons[0][0]}
+        icon={"material-symbols:format-list-bulleted-rounded"}
         tooltip="lists"
-        data={dropdownList}
+        data={TBListDDD}
         isOpen={openDropdown === "lists"}
         onToggle={setOpenDropdown}
       />
@@ -116,12 +106,6 @@ export default function Toolbar() {
           tooltip="format-clear"
         />
       </div>
-      <Button
-        icon="material-symbols:chevron-left-rounded"
-        action={() => console.log("Chevron")}
-        type="normal"
-        tooltip="collapse"
-      />
     </div>
   );
 }

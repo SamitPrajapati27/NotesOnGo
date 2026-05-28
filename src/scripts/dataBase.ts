@@ -1,6 +1,11 @@
-import {Note} from "@/src/types/MainTypes";
+import { NoteData } from "@/src/types/BasicTypes";
 
-const database: Note = [];
+export const database: Array<NoteData> = [];
+
+database.push({
+    title: "New note",
+    data: ["Words"]
+})
 
 /*
 function create(){
