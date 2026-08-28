@@ -13,7 +13,7 @@ export default function NoteFile({ data }: NoteFileProps) {
   const [noteFileTitle, setNoteFileTitle] = useState(data.title);
 
   return (
-    <div className="w-64 bg-secondary-bg border-primary-border p-2 flex justify-between">
+    <div className="w-full md:w-64 bg-secondary-bg border-primary-border rounded-lg p-2 flex justify-between">
       {editMode ? (
         <div>
           <input
@@ -43,7 +43,7 @@ export default function NoteFile({ data }: NoteFileProps) {
             type="normal"
             tooltip="trash"
             position="down"
-            extra="!text-md !border-2 !border-primary-border"
+            extra="!text-xl btn-full"
           />
           <Button
             icon={editMode ? "mdi:edit" : "mdi:edit-off"}
@@ -51,7 +51,7 @@ export default function NoteFile({ data }: NoteFileProps) {
             type="normal"
             tooltip={editMode ? "edit-off" : "edit"}
             position="down"
-            extra="!text-md !border-2 !border-primary-border"
+            extra="!text-xl btn-full"
           />
           <Button
             icon="mdi:close"
@@ -59,7 +59,7 @@ export default function NoteFile({ data }: NoteFileProps) {
             type="normal"
             tooltip="close"
             position="down"
-            extra="!text-md !border-2 !border-primary-border"
+            extra="!text-xl btn-full"
           />
         </div>
         <div
@@ -75,7 +75,7 @@ export default function NoteFile({ data }: NoteFileProps) {
             type="normal"
             tooltip="more"
             position="right"
-            extra="!text-md !border-2 !border-primary-border"
+            extra="md:!text-md btn-full"
           />
         </div>
       </div>

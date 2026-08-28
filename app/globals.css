@@ -37,26 +37,27 @@ body {
   background: var(--color-zinc-800);
   color: white;
   --primary-border: var(--color-zinc-600);
+  --secondary-bg: var(--color-stone-700);
 }
-.popup{
+.popup {
   @apply flex w-full justify-between rounded-lg border border-primary-border p-4 overflow-hidden;
 }
 .popup-row {
-  @apply bg-zinc-100 ;
+  @apply bg-zinc-100 dark:bg-zinc-700;
 }
 
 .popup-row:nth-child(2) {
-  @apply bg-zinc-200 ;
+  @apply bg-zinc-200 dark:bg-zinc-700;
 }
 
 .popup-row:nth-child(3) {
-  @apply bg-zinc-300 ;
+  @apply bg-zinc-300 dark:bg-zinc-800;
 }
 
 .popup-row:nth-child(4) {
-  @apply bg-zinc-400 ;
+  @apply bg-zinc-400 dark:bg-zinc-800;
 }
 
 .popup-row:nth-child(5) {
-  @apply bg-zinc-500;
+  @apply bg-zinc-500 dark:bg-zinc-900;
 }

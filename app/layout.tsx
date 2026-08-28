@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Serif,Gamja_Flower } from "next/font/google"
+import { IBM_Plex_Serif, Gamja_Flower } from "next/font/google";
 import "./globals.css";
-
 export const ibmPlexSerif = IBM_Plex_Serif({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
@@ -26,8 +25,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${gamjaFlower.variable} ${gamjaFlower.variable} h-full antialiased`}
-    >
+      className={`${gamjaFlower.variable} ${gamjaFlower.variable} h-full antialiased`}>
       <body className="h-full flex flex-col">{children}</body>
     </html>
   );

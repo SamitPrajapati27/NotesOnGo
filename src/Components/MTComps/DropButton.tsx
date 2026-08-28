@@ -32,7 +32,7 @@ export default function DropButton({
     }
   };
   return (
-    <div className="relative inline-block z-50">
+    <div className="relative z-50 inline-block">
       <Button
         icon={displayIcon}
         text={displayText ?? "btn"}
@@ -42,7 +42,7 @@ export default function DropButton({
         type={isOpen ? "dropdown-open" : "dropdown"}
       />
       {isOpen && (
-        <ul className="absolute bg-white border border-border rounded-lg mt-2 text-center">
+        <ul className="absolute z-50 bg-white border border-border rounded-lg mt-2 text-center">
           {data.map((item, index) => (
             <li key={index}>
               <Button

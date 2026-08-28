@@ -6,12 +6,12 @@ export default function Export() {
   const [openDropdown, setOpenDropdown] = useState<string>("");
 
   return (
-    <div className="flex flex-col items-center space-y-2">
+    <div className="flex flex-col items-center space-y-2 overflow-y-visible">
       <div className="popup popup-row">
         <span>File Name</span>
         <input type="text" />
       </div>
-      <div className="popup popup-row">
+      <div className="popup popup-row overflow-y-visible">
         <span>File Type</span>
         <DropButton
           id="fileTypes"
@@ -20,6 +20,7 @@ export default function Export() {
           data={PUExportDDD}
           isOpen={openDropdown === "fileTypes"}
           onToggle={setOpenDropdown}
+          pos="right"
         />
       </div>
       <Button

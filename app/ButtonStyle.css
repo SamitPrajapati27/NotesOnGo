@@ -2,9 +2,12 @@
 @import "./globals.css";
 
 .btn {
-  @apply p-1 rounded-md transition-colors duration-300 ease-in-out border border-transparent hover:bg-accent dark:hover:text-black cursor-pointer;
+  @apply p-0.5 !text-sm md:text-lg md:p-1 rounded-md transition-colors duration-300 ease-in-out border border-transparent hover:bg-accent dark:hover:text-black cursor-pointer;
 }
 
+.btn-full{
+  @apply bg-primary-bg border border-primary-border!;
+}
 
 .btn-last {
   @apply border-r-2 rounded-none border-zinc-200;

@@ -1,19 +1,18 @@
 "use client";
 import { useState, useRef } from "react";
-import { useSlate,ReactEditor } from "slate-react";
+import { useSlate,ReactEditor, Slate } from "slate-react";
 import Button from "@/src/Components/MTComps/Button";
 import DropButton from "@/src/Components/MTComps/DropButton";
 import { Editor, Transforms } from "slate";
-import { isMarkActive,isBlockActive } from "@/src/scripts/engine";
-import {TBListDDD,TBHeadDDD,TBFontsDDD} from "@/src/scripts/setup";
+import { isMarkActive,isBlockActive,clearFormat, changeIndent} from "@/src/scripts/engine";
+import {createListDropdown,TBFontsDDD,createHeadingDropdown} from "@/src/scripts/setup";
 export default function Toolbar() {
   const [openDropdown, setOpenDropdown] = useState<string>("");
-  const toolbarRef = useRef<HTMLDivElement>(null);
   const editor = useSlate();
-
   const toggleMark = (format: string) => {
     const isActive = isMarkActive(editor, format);
     const selection = editor.selection;
+    if (!selection) return;
     if (isActive) {
       Editor.removeMark(editor, format);
     } else {
@@ -22,22 +21,11 @@ export default function Toolbar() {
     Transforms.select(editor, selection);
     ReactEditor.focus(editor)
   };
-  const toggleBlock = (format: string) => {
-    const isActive = isBlockActive(editor, format);
-
-    Transforms.setNodes(
-      editor,
-      {
-        type: isActive ? "paragraph" : format,
-      },
-      {
-        match: (n) => Editor.isBlock(editor, n),
-      },
-    );
-  };
+  const heads = createHeadingDropdown(editor),
+        lists = createListDropdown(editor);
   return (
     <div
-      className="p-1 rounded-md bg-primary-bg border-primary-border border divide-x divide-primary-border size-fit mx-auto mt-2 flex items-center justify-between ">
+      className="p-1 rounded-md md:my-3 border-primary-border border divide-x divide-primary-border size-fit mx-auto flex items-center justify-between ">
       <div className="">
         <Button
           icon="material-symbols:format-bold-rounded"
@@ -66,7 +54,7 @@ export default function Toolbar() {
         id="headings"
         text={"Heading 1"}
         tooltip="headings"
-        data={TBHeadDDD}
+        data={heads}
         isOpen={openDropdown === "headings"}
         onToggle={setOpenDropdown}
       />
@@ -82,26 +70,26 @@ export default function Toolbar() {
         id="lists"
         icon={"material-symbols:format-list-bulleted-rounded"}
         tooltip="lists"
-        data={TBListDDD}
+        data={lists}
         isOpen={openDropdown === "lists"}
         onToggle={setOpenDropdown}
       />
       <div className="">
         <Button
           icon="material-symbols:format-indent-decrease-rounded"
-          action={() => console.log("Indent")}
+          action={() => changeIndent(editor,"decrease")}
           type="normal"
           tooltip="Decrease-indent"
         />
         <Button
           icon="material-symbols:format-indent-increase-rounded"
-          action={() => console.log("Indent")}
+          action={() => changeIndent(editor,"increase")}
           type="normal"
           tooltip="Increase-indent"
         />
         <Button
           icon="material-symbols:format-clear-rounded"
-          action={() => console.log("Clear")}
+          action={() => clearFormat(editor)}
           type="normal"
           tooltip="format-clear"
         />

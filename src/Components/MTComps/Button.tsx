@@ -20,9 +20,9 @@ export default function Button({
   return (
     <div className="relative inline-block font-sans">
       <button
-        className={`btn peer text-sm ` + extra}
+        className={`btn peer text-lg ` + extra}
         onClick={action ?? (() => {})}>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center md:gap-1">
           {icon ? (
             <Icon icon={icon ?? "material-symbols:error"} />
           ) : (
@@ -31,11 +31,13 @@ export default function Button({
           {endIcon && <Icon icon={endIcon} />}
         </div>
       </button>
-      <div
-        data-position={position}
-        className={`tooltip tooltip-${position} z-50 hidden scale-95 transition-all ease-in-out duration-500 peer-hover:block peer-hover:scale-100`}>
-        {tooltip}
-      </div>
+      { tooltip &&
+        <div
+          data-position={position}
+          className={`tooltip tooltip-${position} z-50 hidden md:hidden scale-95 transition-all ease-in-out duration-500 md:peer-hover:block md:peer-hover:scale-100`}>
+          {tooltip}
+        </div>
+      }
     </div>
   );
 }

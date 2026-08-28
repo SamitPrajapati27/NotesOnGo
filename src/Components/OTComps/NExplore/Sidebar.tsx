@@ -22,7 +22,7 @@ export default function SideBar({ setSideBar, settingsPopup }: SideBarProps) {
 
   return (
     <>
-      <section className="w-72 h-full space-y-4 flex flex-col bg-primary-bg border border-primary-border rounded-r-lg *:p-2">
+      <section className="w-screen lg:w-72 h-full space-y-4 flex flex-col bg-primary-bg border border-primary-border rounded-r-2xl *:p-2">
         <div className="flex items-center justify-between mt-1">
           <Button
             icon="material-symbols:view-sidebar"
@@ -34,7 +34,7 @@ export default function SideBar({ setSideBar, settingsPopup }: SideBarProps) {
             position="down"
             extra="!text-2xl"
           />
-          <h1 className="text-2xl text-center w-full">Notes to Go</h1>
+          <h1 className="text-xl md:text-2xl text-center w-full">Notes on Go</h1>
         </div>
 
         <div className="search-area"></div>
@@ -51,9 +51,9 @@ export default function SideBar({ setSideBar, settingsPopup }: SideBarProps) {
                 console.log("New Note");
               }}
               type="normal"
-              tooltip="sidebar"
+              tooltip="New Note"
               position="down"
-              extra="!text-xl !border-2 !border-primary-border !w-48"
+              extra="!text-xl !border-2 !border-primary-border w-72 h-10 md:!w-48"
             />
           </div>
         </div>
@@ -67,7 +67,6 @@ export default function SideBar({ setSideBar, settingsPopup }: SideBarProps) {
             }
             action={() => {
               setDark((d) => !d);
-              console.log(document.documentElement.classList);
             }}
             type="normal"
             tooltip="theme"
