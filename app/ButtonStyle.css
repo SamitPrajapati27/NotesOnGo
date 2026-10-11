@@ -7,7 +7,7 @@
   transition: background-color 180ms ease, border-color 180ms ease, transform 120ms ease;
 }
 .btn:hover { background: var(--accent); color: var(--accent-foreground); }
-.btn:active { transform: scale(0.96); }
+.btn:active { border-color: var(--accent); }
 .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .btn-full { background: var(--primary-bg); border-color: var(--primary-border); }
 .btn-last { border-right: 2px solid var(--primary-border); border-radius: 0; }
@@ -23,7 +23,7 @@
   border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 1px var(--secondary-bg);
 }
 .tooltip {
-  @apply fixed z-[1000] pointer-events-none max-w-[calc(100vw-1rem)] break-words rounded bg-neutral-900 text-neutral-50 border border-zinc-600 text-sm px-2 py-1 shadow-md;
+  @apply fixed z-[1000] pointer-events-none max-w-[calc(100vw-1rem)] break-words rounded-lg bg-secondary-bg text-foreground border border-primary-border text-sm px-3 py-2;
 }
 @media (prefers-reduced-motion: reduce) {
   .btn { transition: none; }

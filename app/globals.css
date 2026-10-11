@@ -122,3 +122,31 @@ input[aria-label="Note title"]:focus-visible {
     animation: none;
   }
 }
+
+.text-box {
+  caret-color: var(--accent);
+  transition:
+    border-color 180ms ease,
+    background-color 180ms ease,
+    box-shadow 180ms ease;
+}
+.text-box:hover {
+  border-color: var(--accent);
+  background-color: color-mix(in srgb, var(--accent) 10%, var(--secondary-bg));
+}
+.text-box:focus,
+.text-editor:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .text-box,
+  .text-editor {
+    transition: none;
+  }
+}
+
+.text-box,
+.text-box:active {
+  background-color: var(--theme-main-bg);
+}

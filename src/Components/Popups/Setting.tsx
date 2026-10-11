@@ -40,23 +40,17 @@ export default function Setting({ settings, setSettings }: SettingState) {
           label="Tooltips"
           checked={settings.toolTip}
           action={() => {
-            // This causes an error
             setSettings((s) => ({ ...s, toolTip: !s.toolTip }));
           }}
         />
       </div>
-      {
-        //This is for future setting features
-      }
-      {/*
-  <div className="popup popup-row">
-    <span>Font</span>
-  </div>
-
-  <div className="popup popup-row">
-    <span>Spacing</span>
-  </div>
-  */}
+      <div className="popup popup-row">
+        <div className="space-y-1">
+          <span>Markdown shortcuts</span>
+        </div>
+        <Toggle label="Markdown shortcuts" checked={settings.markdownShortcuts}
+          action={() => setSettings(s => ({ ...s, markdownShortcuts: !s.markdownShortcuts }))} />
+      </div>
     </div>
   );
 }

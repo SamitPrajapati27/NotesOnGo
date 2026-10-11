@@ -1,6 +1,7 @@
+"use client";
 import { DropdownObject } from "@/src/types/BasicTypes";
 import Button from "./Button";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 /**
  * Render a controlled dropdown and display the selected item’s icon or label.
  */
@@ -15,6 +16,28 @@ export default function DropButton({
   pos,
   menuDirection = "down",
 }: DropdownObject) {
+  const root = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!isOpen) return;
+    const outside = (event: PointerEvent | FocusEvent) => {
+      if (event.target instanceof Node && !root.current?.contains(event.target)) onToggle?.("");
+    };
+    const escape = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      event.preventDefault();
+      event.stopPropagation();
+      onToggle?.("");
+      root.current?.querySelector("button")?.focus();
+    };
+    document.addEventListener("pointerdown", outside, true);
+    document.addEventListener("focusin", outside);
+    document.addEventListener("keydown", escape, true);
+    return () => {
+      document.removeEventListener("pointerdown", outside, true);
+      document.removeEventListener("focusin", outside);
+      document.removeEventListener("keydown", escape, true);
+    };
+  }, [isOpen, onToggle]);
   /**
    * Ask the parent to open this dropdown or close it when already open.
    */
@@ -42,7 +65,7 @@ export default function DropButton({
     }
   };
   return (
-    <div className="relative z-50 inline-block">
+    <div ref={root} className="relative z-50 inline-block">
       <Button
         icon={displayIcon}
         text={(id === "fonts" ? text : displayText) ?? "btn"}
@@ -52,7 +75,7 @@ export default function DropButton({
         type={isOpen ? "dropdown-open" : "dropdown"}
       />
       {isOpen && (
-        <ul className={`popup-enter absolute right-0 z-50 min-w-max bg-secondary-bg text-foreground border border-primary-border rounded-lg text-center p-1 space-y-1 shadow-lg ${menuDirection === "up" ? "bottom-full mb-2" : "top-full mt-2"}`}>
+        <ul className={`popup-enter absolute right-0 z-50 min-w-max bg-secondary-bg text-foreground border border-primary-border rounded-lg text-center p-1 space-y-1 ${menuDirection === "up" ? "bottom-full mb-2" : "top-full mt-2"}`}>
           {data.map((item, index) => (
             <li key={index}>
               <Button

@@ -2,8 +2,9 @@
 import Button from "../../MTComps/Button";
 import NoteFile from "./noteFile";
 import type { NoteData } from "@/src/types/BasicTypes";
+import Spinner from "../../MTComps/Spinner";
 import SearchBar from "./SearchBar";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useDeferredValue, useMemo } from "react";
 import { PopupController } from "@/src/scripts/setup";
 type SideBarProps = {
   setSideBar: React.Dispatch<React.SetStateAction<boolean>>;
@@ -18,9 +19,28 @@ type SideBarProps = {
 /**
  * Filter notes by title and expose note actions, theme switching, and settings.
  */
-export default function SideBar({ setSideBar, settingsPopup, notes, activeNoteId, onCreate, onSelect, onRename, onDelete }: SideBarProps) {
+export default function SideBar({
+  setSideBar,
+  settingsPopup,
+  notes,
+  activeNoteId,
+  onCreate,
+  onSelect,
+  onRename,
+  onDelete,
+}: SideBarProps) {
   const [query, setQuery] = useState("");
-  const visibleNotes = notes.filter((note) => (note.title || "Untitled Note").toLowerCase().includes(query.toLowerCase().trim()));
+  const deferredQuery = useDeferredValue(query);
+  const searching = query !== deferredQuery;
+  const visibleNotes = useMemo(
+    () =>
+      notes.filter((note) =>
+        (note.title || "Untitled Note")
+          .toLowerCase()
+          .includes(deferredQuery.toLowerCase().trim()),
+      ),
+    [notes, deferredQuery],
+  );
   const [dark, setDark] = useState(false);
   useEffect(() => {
     const root = document.documentElement;
@@ -34,7 +54,9 @@ export default function SideBar({ setSideBar, settingsPopup, notes, activeNoteId
 
   return (
     <>
-      <section aria-label="Notes library" className="w-[calc(100vw-3rem)] max-w-80 sm:w-80 lg:w-72 h-dvh gap-3 flex flex-col bg-primary-bg border border-primary-border rounded-r-2xl *:p-2">
+      <section
+        aria-label="Notes library"
+        className="w-[calc(100vw-3rem)] max-w-80 sm:w-80 lg:w-72 h-dvh gap-3 flex flex-col bg-primary-bg border border-primary-border rounded-r-2xl *:p-2">
         <div className="flex items-center justify-between mt-1">
           <Button
             icon="material-symbols:view-sidebar"
@@ -46,16 +68,40 @@ export default function SideBar({ setSideBar, settingsPopup, notes, activeNoteId
             position="down"
             extra="!text-2xl"
           />
-          <h1 className="text-xl md:text-2xl text-center w-full">Notes on Go</h1>
+          <h1 className="text-xl md:text-2xl text-center w-full">
+            Notes on Go
+          </h1>
         </div>
 
-        <div className="search-area"><SearchBar query={query} onSearch={setQuery} /></div>
+        <div className="search-area">
+          <SearchBar query={query} onSearch={setQuery} />
+        </div>
 
         <div className="flex-1 min-h-0 flex flex-col gap-2">
           <h2 className="items-start">Your Notes:</h2>
-          <div className="flex-1 min-h-0 flex flex-col w-full gap-2 overflow-y-auto">
-            {visibleNotes.map((note) => <NoteFile key={note.id} data={note} active={note.id === activeNoteId} onSelect={() => { onSelect(note.id); setSideBar(false); }} onRename={(title) => onRename(note.id, title)} onDelete={() => onDelete(note.id)} />)}
-            {visibleNotes.length === 0 && <p className="text-sm p-2">No matching notes.</p>}
+          <div
+            aria-busy={searching}
+            className="flex-1 min-h-0 flex flex-col w-full gap-2 overflow-y-auto">
+            {searching && <Spinner compact label="Searching notes…" />}
+            {visibleNotes.map((note) => (
+              <NoteFile
+                key={note.id}
+                data={note}
+                active={note.id === activeNoteId}
+                onSelect={() => {
+                  onSelect(note.id);
+                  setSideBar(false);
+                }}
+                onRename={(title) => onRename(note.id, title)}
+                onDelete={() => onDelete(note.id)}
+              />
+            ))}
+            {!searching && visibleNotes.length === 0 && (
+              <div className="size-fit text-center space-y-1">
+                <img src="/corvus-confused.png" alt="Corvus confused"/>
+                <p className="text-sm italic">Note not found</p>
+              </div>
+            )}
           </div>
           <div className="pt-2 w-full shrink-0">
             <Button
@@ -74,7 +120,7 @@ export default function SideBar({ setSideBar, settingsPopup, notes, activeNoteId
           </div>
         </div>
 
-        <div className="Theme-Setting flex w-full shrink-0 justify-around">
+        <div className=" flex w-full shrink-0 justify-around">
           <Button
             icon={
               dark

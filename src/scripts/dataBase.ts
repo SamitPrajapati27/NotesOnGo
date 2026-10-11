@@ -15,7 +15,7 @@ export type NoteCollection = {
 export function createNote(): NoteData {
   const now = new Date().toISOString();
   return {
-    id: crypto.randomUUID(),
+    id: crypto.randomUUID().replace(/-/g, "").slice(0, 12),
     title: "Untitled Note",
     data: [{ type: "paragraph", children: [{ text: "" }] }],
     createdAt: now,

@@ -1,4 +1,5 @@
 "use client";
+import TextBox from "../MTComps/TextBox";
 import { useState } from "react";
 import { createPortal } from "react-dom";
 import Button from "../MTComps/Button";
@@ -29,12 +30,12 @@ export default function LinkDialog({ initialText, initialUrl, onApply, onClose, 
       }}>
         <label className="popup popup-row">
           <span>Text</span>
-          <input aria-label="Text to display" value={text} placeholder="Text to display" onChange={(event) => setText(event.target.value)}
+          <TextBox aria-label="Text to display" value={text} placeholder="Text to display" onChange={(event) => setText(event.target.value)}
             className="min-w-0 w-44 bg-transparent text-foreground outline-none focus:ring-1 focus:ring-accent rounded" />
         </label>
         <label className="popup popup-row">
           <span>Address</span>
-          <input autoFocus aria-label="Link address" value={url} placeholder="https://example.com" onChange={(event) => { setUrl(event.target.value); setError(""); }}
+          <TextBox autoFocus aria-label="Link address" value={url} placeholder="https://example.com" onChange={(event) => { setUrl(event.target.value); setError(""); }}
             className="min-w-0 w-44 bg-transparent text-foreground outline-none focus:ring-1 focus:ring-accent rounded" />
         </label>
         {error && <p role="alert" className="text-sm px-1">{error}</p>}

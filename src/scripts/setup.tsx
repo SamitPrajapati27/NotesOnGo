@@ -1,6 +1,6 @@
 import { DropdownData, shortcutData, SettingData } from "../types/BasicTypes";
 import { formatBlocks, toggleHeading, toggleList } from "./engine";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Editor, Element } from "slate";
 /**
  * Build a dropdown item, using its tooltip as the fallback display text.
@@ -29,16 +29,51 @@ function ezCreateDDD(
 /**
  * Initialize session-only display preferences and expose their state setter.
  */
-export function useSettings(){
-    const [settings, setSettings] = useState<SettingData>({
-      accent: "purple",
-      font: "Default",
-      spacing: 10,
-      toolTip: true,
-    });
-    return {settings, setSettings};
+export function useSettings() {
+  const [settings, setSettings] = useState<SettingData>({
+    accent: "purple",
+    font: "Default",
+    spacing: 10,
+    toolTip: true,
+    markdownShortcuts: true,
+  });
+  const [loaded, setLoaded] = useState(false);
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(
+        localStorage.getItem("notes-on-go-preferences") || "{}",
+      );
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setSettings((previous) => ({
+        ...previous,
+        ...(typeof saved.markdownShortcuts === "boolean"
+          ? { markdownShortcuts: saved.markdownShortcuts }
+          : {}),
+        ...(typeof saved.toolTip === "boolean"
+          ? { toolTip: saved.toolTip }
+          : {}),
+      }));
+    } catch {
+      /* Optional preferences must never prevent opening notes. */
+    }
+    setLoaded(true);
+  }, []);
+  useEffect(() => {
+    if (!loaded) return;
+    try {
+      localStorage.setItem(
+        "notes-on-go-preferences",
+        JSON.stringify({
+          markdownShortcuts: settings.markdownShortcuts,
+          toolTip: settings.toolTip,
+        }),
+      );
+    } catch {
+      /* Keep preferences usable for this session when storage is unavailable. */
+    }
+  }, [loaded, settings.markdownShortcuts, settings.toolTip]);
+  return { settings, setSettings };
 }
-
 
 // Used for ToolBar //
 export const dropdownListIcons = [
@@ -91,7 +126,6 @@ export function createHeadingDropdown(editor: Editor): DropdownData[] {
       item[0],
       () => {
         toggleHeading(editor, item[1] as Element["type"]);
-
       },
       undefined,
       item[0],
@@ -101,9 +135,11 @@ export function createHeadingDropdown(editor: Editor): DropdownData[] {
 /**
  * Build font choices that call the parent’s font-change callback.
  */
-export function createFontDropdown(onChange: (font: SettingData["font"]) => void): DropdownData[] {
-  return (["Default", "Elegant", "Fun"] as const).map(
-    (font) => ezCreateDDD(font, () => onChange(font), undefined, font),
+export function createFontDropdown(
+  onChange: (font: SettingData["font"]) => void,
+): DropdownData[] {
+  return (["Default", "Elegant", "Fun"] as const).map((font) =>
+    ezCreateDDD(font, () => onChange(font), undefined, font),
   );
 }
 

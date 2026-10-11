@@ -69,6 +69,42 @@ show a recovery screen rather than silently opening a different note.
 See [the implementation plan](docs/multiple-notes.md) for the storage model,
 validation, and follow-up work.
 
+## Hotkeys and Markdown Format
+
+The scrollable **Info** popup contains Hotkeys and Markdown Format reference tables.
+Its heading and close button stay visible while the content scrolls.
+
+| Action | Hotkey |
+| --- | --- |
+| Bold | ⌘ / Ctrl + B |
+| Italic | ⌘ / Ctrl + I |
+| Underline | ⌘ / Ctrl + U |
+| Insert or edit link | ⌘ / Ctrl + K |
+| Undo | ⌘ / Ctrl + Z |
+| Redo | ⌘ / Ctrl + Shift + Z |
+
+Markdown shortcuts format text as you type. Complete inline markers, or press
+Space after a block marker at the beginning of a line.
+
+| Format | What to type |
+| --- | --- |
+| Bold | `**bold**` or `__bold__` |
+| Italic | `*italic*` or `_italic_` |
+| Bold and italic | `***bold italic***` |
+| Headings 1–3 | `#`, `##`, or `###`, then Space |
+| Bullet list | `-`, `*`, or `+`, then Space |
+| Numbered list | `1.` or `1)`, then Space |
+| Task list | `[ ]` or `[x]`, then Space |
+| Link | `[text](https://example.com)` |
+
+Undo restores the literal markers. Pasted text is not automatically converted;
+use file import to parse a Markdown document. Escaped markers remain literal,
+and unsafe link addresses are not converted into links.
+
+Toggle **Markdown shortcuts** or **Tooltips** in Settings. These preferences
+persist in localStorage under `notes-on-go-preferences`; theme and accent
+choices remain session-only.
+
 ## Checks
 
 ```sh
@@ -81,6 +117,14 @@ npm run build
 The production build downloads Google Fonts and requires network access.
 
 ## UI controls
+
+- Tooltips and dropdowns share rounded borders, theme colors, and an entrance animation, without shadows. Dropdowns close on outside click, focus leaving, or Escape. Tooltips respect the Settings toggle and appear for mouse hover or keyboard focus.
+- `TextBox` is the shared field for titles, search, renaming, export filenames, and link text/addresses. It uses accent borders, hover, and focus styling.
+- The rich-text editor keeps its theme background on hover and focus. Its placeholder and text share a padded writing area, with extra space above the first line.
+- `Spinner` displays accessible loading feedback for startup, navigation, pending searches, and file imports, with a reduced-motion fallback.
+- Import & Export separates its two workflows, offers format cards and a filename field for downloads, and previews imported note titles before adding them.
+- Missing-note links show a recovery page with a Go Home action that returns to an available note.
+
 
 `Toggle` supports `size="sm"`, `size="md"` (default), and `size="lg"`.
 Autosave uses the small 36 × 20px track; the thumb keeps a 2px inset at each size.
@@ -100,7 +144,7 @@ autosave alignment, Save feedback, and export controls.
 
 1. `app/layout.tsx` provides global styles, metadata, and the two Google Fonts. Both `/` and `/notes/[id]` render the workspace in `app/page.tsx`.
 2. `useNotes()` in `src/scripts/saving.ts` loads and validates the localStorage collection after mounting. It resolves the requested note ID and exposes create, select, edit, rename, delete, import, and save commands.
-3. `TextEditor` creates a Slate editor enhanced with React, undo/redo history, and inline links. Document changes go back to `useNotes`; selection-only changes do not trigger document saves. Switching notes remounts the editor for that note.
+3. `TextEditor` creates a Slate editor enhanced with React, undo/redo history, inline links, and typed Markdown shortcuts. Document changes go back to `useNotes`; selection-only changes do not trigger document saves. Switching notes remounts the editor for that note.
 4. Toolbar commands call Slate transformations in `engine.tsx` and `links.ts`. Slate renderers turn stored elements and text marks into the visible document.
 5. Collection changes update memory first. With autosave enabled, each change attempts a localStorage write. A stored snapshot check prevents a stale tab from overwriting another tab’s edits.
 6. Import converts supported files into validated notes with fresh IDs. Export serializes the active note and starts a browser download using a temporary Blob URL.
@@ -114,7 +158,7 @@ The storage value is a JSON object with `version: 1`, a `notes` array, and `acti
 | Location | Responsibility |
 | --- | --- |
 | `app/` | Next.js routes, root layout, global styles, and shared button styles |
-| `src/Components/MTComps/` | Reusable buttons, dropdowns, switches, and modal shell |
+| `src/Components/MTComps/` | Reusable buttons, dropdowns, switches, TextBox, Spinner, and modal shell |
 | `src/Components/OTComps/` | Slate editor, toolbar, link dialog, and workspace utilities |
 | `src/Components/OTComps/NExplore/` | Sidebar, title search, and editable note rows |
 | `src/Components/Popups/` | Import/export, information, and settings content |
@@ -122,6 +166,7 @@ The storage value is a JSON object with `version: 1`, a `notes` array, and `acti
 | `src/scripts/saving.ts` | React state, autosave, save feedback, and browser navigation |
 | `src/scripts/engine.tsx`, `hotkeys.ts`, `links.ts` | Slate rendering, formatting, keyboard behavior, and link editing |
 | `src/scripts/importing.ts`, `exporting.ts` | File conversion, validation, and downloads |
+| `src/scripts/markdownShortcuts.ts` | Typed Markdown transformations, safe links, and undo batching |
 | `src/scripts/setup.tsx` | Dropdown configuration, popup/settings hooks, shortcuts, and word counts |
 | `src/scripts/noteRoutes.ts`, `urls.ts`, `tooltips.ts` | Note paths, link normalization, and tooltip placement |
 | `src/types/` | Shared component interfaces and Slate custom types |
@@ -160,10 +205,9 @@ Named functions, components, hooks, and handlers use JSDoc-style `/** ... */` su
 ### Current limitations
 
 - There is no account system, backend notes database, cross-device sync, or public note sharing. Note URLs only identify data in the current browser.
-- Theme and accent choices are session-only. The tooltip preference is present in settings but is not yet connected to the shared button tooltips.
-- The toolbar updates indentation metadata, but the active renderer does not use the existing `BlockWrapper` that applies indentation and alignment.
+- Theme and accent choices are session-only. Markdown and tooltip preferences persist locally.
 - Markdown and plain-text exports cannot preserve every Slate property; use JSON for full note fidelity.
-- `Save.tsx` and `Input-Textbox.tsx` are placeholders that currently render nothing.
+- `Save.tsx` remains a placeholder; the active save control is provided by the workspace utilities.
 - `/tests/` is ignored as requested. `npm test` requires those local files; a fresh clone will not receive untracked test files through Git.
 
 ## Contributors

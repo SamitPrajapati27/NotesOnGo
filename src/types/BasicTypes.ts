@@ -72,12 +72,14 @@ export type SettingData = {
   font: "Default" | "Elegant" | "Fun";
   spacing: number;
   toolTip: boolean;
+  markdownShortcuts: boolean;
 }
 export const settingsOptions = {
   accent: ["blue", "green", "purple", "red", "orange"],
   font: ["Default", "Elegant", "Fun"],
   spacing: [10, 12, 14, 16],
   toolTip: [true,false],
+  markdownShortcuts: [true,false],
 } satisfies { [K in keyof SettingData]: SettingData[K][] }
 
 export type SettingState = {
@@ -91,6 +93,7 @@ export type PopupProps = {
   onClose: () => void;
   title: string;
   children?: ReactNode;
+  wide?: boolean;
 };
 
 export type NoteData = {

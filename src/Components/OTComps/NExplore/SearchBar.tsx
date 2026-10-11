@@ -1,4 +1,5 @@
 "use client";
+import TextBox from "../../MTComps/TextBox";
 
 import { Icon } from '@iconify/react';
 type SearchBarProps = {
@@ -31,7 +32,7 @@ export default function SearchBar({ query, onSearch }: SearchBarProps) {
       <Icon icon="material-symbols:search-rounded"/>
 
       {/* Text input */}
-      <input
+      <TextBox
         type="text"
         value={query}
         onChange={handleChange}
