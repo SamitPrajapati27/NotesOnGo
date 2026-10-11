@@ -1,17 +1,12 @@
 import {
-  SettingData,
   settingsOptions,
   SettingState,
   accents,
 } from "@/src/types/BasicTypes";
 import Toggle from "../MTComps/Toggle";
-const accentColors: Record<SettingData["accent"], string> = {
-  blue: "bg-blue-500",
-  green: "bg-green-500",
-  purple: "bg-purple-500",
-  red: "bg-red-500",
-  orange: "bg-orange-400",
-};
+/**
+ * Render accent and tooltip preferences; accent changes update the root CSS variable.
+ */
 export default function Setting({ settings, setSettings }: SettingState) {
   return (
     <div className="flex flex-col space-y-2 items-center ">
@@ -21,6 +16,8 @@ export default function Setting({ settings, setSettings }: SettingState) {
           {settingsOptions.accent.map((color) => (
             <button
               key={color}
+              aria-label={`${color} accent`}
+              style={{ backgroundColor: accents[color].hex }}
               onClick={() => {
                 setSettings((s) => ({ ...s, accent: color }));
                 // one of the most useful code in this project
@@ -31,8 +28,7 @@ export default function Setting({ settings, setSettings }: SettingState) {
               }}
               className={`
                 w-6 h-6 rounded-full transition-all
-                ${accentColors[color]}
-                ${settings.accent === color ? "ring-2 ring-offset-2 ring-zinc-400" : "opacity-70"}
+                ${settings.accent === color ? "ring-2 ring-offset-2 ring-offset-secondary-bg ring-foreground" : "opacity-70"}
               `}
             />
           ))}
@@ -41,8 +37,10 @@ export default function Setting({ settings, setSettings }: SettingState) {
       <div className="popup popup-row">
         <span>Tool Tip</span>
         <Toggle
+          label="Tooltips"
           checked={settings.toolTip}
           action={() => {
+            // This causes an error
             setSettings((s) => ({ ...s, toolTip: !s.toolTip }));
           }}
         />

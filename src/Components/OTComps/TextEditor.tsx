@@ -1,38 +1,95 @@
 "use client";
 import { useState, useMemo } from "react";
-import { Editable, RenderLeafProps, useSlate } from "slate-react";
-import { renderLeaf, renderElement, toggleBlock } from "@/src/scripts/engine";
-import { Editor, Transforms, Element, Descendant, createEditor } from "slate";
+import { Editable } from "slate-react";
+import { renderLeaf, RenderElement } from "@/src/scripts/engine";
+import { Node, Descendant, createEditor, Editor, Range, Transforms } from "slate";
 import { getWordCount } from "@/src/scripts/setup";
-import { Slate, withReact } from "slate-react";
+import { Slate, withReact, ReactEditor } from "slate-react";
+import { withHistory } from "slate-history";
+import { insertLink, linkAtSelection, removeLink, withLinks } from "@/src/scripts/links";
+import LinkDialog from "./LinkDialog";
+import { reportError } from "@/src/scripts/errors";
 import { handleKeyDown } from "@/src/scripts/hotkeys";
+import type { SettingData } from "@/src/types/BasicTypes";
 import Toolbar from "./Toolbar";
-export default function TextEditor() {
-  const [text, setText] = useState("");
-  const [wordCount, setWordCount] = useState(0);
-  const [value, setValue] = useState<Descendant[]>([
-    { type: "paragraph", children: [{ text: "" }] },
-  ]);
-  const editor = useMemo(() => withReact(createEditor()), []);
+type TextEditorProps = {
+  initialValue: Descendant[];
+  font: SettingData["font"];
+  onFontChange: (font: SettingData["font"]) => void;
+  onChange: (value: Descendant[]) => void;
+};
+
+/**
+ * Create a Slate editor with history and links, and report document edits and word counts.
+ */
+export default function TextEditor({ initialValue, onChange, font, onFontChange }: TextEditorProps) {
+  /**
+   * Flatten document blocks into text and count their Unicode word groups.
+   */
+  const countWords = (value: Descendant[]) => getWordCount(value.map((node) => Node.string(node)).join("\n"));
+  const [wordCount, setWordCount] = useState(() => countWords(initialValue));
+  const editor = useMemo(() => withLinks(withHistory(withReact(createEditor()))), []);
+  const [linkDraft, setLinkDraft] = useState<{ selection: Range; text: string; url: string } | null>(null);
+  /**
+   * Capture the editor selection and prepare the selected link or text for the link dialog.
+   */
+  function openLink() {
+    const selection = editor.selection || { anchor: Editor.end(editor, []), focus: Editor.end(editor, []) };
+    Transforms.select(editor, selection);
+    const existing = linkAtSelection(editor);
+    setLinkDraft({ selection: structuredClone(selection), text: existing ? Node.string(existing[0]) : Editor.string(editor, selection), url: existing && "url" in existing[0] ? existing[0].url || "" : "" });
+  }
+  /**
+   * Dismiss the link dialog and restore the saved selection and editor focus.
+   */
+  function closeLink() {
+    if (linkDraft) Transforms.select(editor, linkDraft.selection);
+    setLinkDraft(null);
+    ReactEditor.focus(editor);
+  }
+  /**
+   * Update the word count and notify the parent only for document-changing operations.
+   */
   const handleEditorChange = (newValue: Descendant[]) => {
-    setValue(newValue);
-    const currentText = Editor.string(editor, []);
-    setWordCount(getWordCount(currentText));
+    if (!editor.operations.some((operation) => operation.type !== "set_selection")) return;
+    setWordCount(countWords(newValue));
+    onChange(newValue);
   };
 
   return (
-    <div className="mt-1 relative">
-      <Slate editor={editor} initialValue={value} onChange={handleEditorChange}>
-        <Toolbar />
-        <div className="relative w-full md:w-200 h-[80vh] md:max-h-175 min-h-100 ">
+    <div className="mt-1 relative w-full max-w-200 min-w-0">
+      <Slate editor={editor} initialValue={initialValue} onChange={handleEditorChange}>
+        <Toolbar font={font} onFontChange={onFontChange} onLink={openLink} />
+        {linkDraft && <LinkDialog initialText={linkDraft.text} initialUrl={linkDraft.url}
+          onClose={closeLink}
+          onApply={(text, url) => {
+            insertLink(editor, linkDraft.selection, text, url);
+            setLinkDraft(null);
+            ReactEditor.focus(editor);
+          }}
+          onRemove={linkDraft.url ? () => {
+            removeLink(editor, linkDraft.selection);
+            setLinkDraft(null);
+            ReactEditor.focus(editor);
+          } : undefined}
+        />}
+        <div className="relative w-full h-[calc(100dvh-14rem)] min-[1360px]:h-[calc(100dvh-9rem)] min-h-64 sm:min-h-80 ">
           <Editable
+            style={{ fontFamily: font === "Elegant" ? 'var(--font-ibm-serif), Georgia, serif' : font === "Fun" ? 'var(--font-gamja), cursive' : 'Arial, Helvetica, sans-serif' }}
             renderLeaf={renderLeaf}
-            renderElement={renderElement}
-            onKeyDown={(event) => handleKeyDown(event, editor)}
+            renderElement={(props) => <RenderElement {...props} onEditLink={openLink} />}
+            onKeyDown={(event) => {
+              if (event.nativeEvent.isComposing) return;
+              try {
+              if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") { event.preventDefault(); openLink(); return; }
+              handleKeyDown(event, editor);
+              } catch (error) { event.preventDefault(); reportError(error, "Editor error"); }
+            }}
+            aria-label="Note content"
             placeholder="Start Typing"
-            className="size-full appearance-none border border-primary-border rounded-lg resize-none p-1 md:p-2 focus:outline-none focus:ring-0"
+            className="size-full appearance-none border border-primary-border rounded-lg resize-none overflow-y-auto [overflow-wrap:anywhere] p-3 pb-16 focus:outline-none focus:ring-0"
           />
-          <div className="absolute text-center flex space-x-2 md:w-20 right-2 md:left-5 bottom-5 p-0.5 md:p-2 bg-primary-bg border border-primary-border rounded-xl ">
+          <div className="absolute left-3 bottom-3 text-center whitespace-nowrap flex space-x-2 p-2 bg-primary-bg border border-primary-border rounded-xl ">
             <p className="">
               {wordCount}
               <span className="ml-1">Word</span>

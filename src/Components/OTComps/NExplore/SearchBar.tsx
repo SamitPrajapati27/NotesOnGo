@@ -1,26 +1,32 @@
 "use client";
 
-import { useState } from "react";
 import { Icon } from '@iconify/react';
 type SearchBarProps = {
+  query: string;
   onSearch: (query: string) => void;
 };
 
-export default function SearchBar({ onSearch }: SearchBarProps) {
-  const [query, setQuery] = useState("");
+/**
+ * Render the controlled note-title search input and its clear action.
+ */
+export default function SearchBar({ query, onSearch }: SearchBarProps) {
 
+  /**
+   * Forward the current search input value to the sidebar.
+   */
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    setQuery(e.target.value);
     onSearch(e.target.value);
   }
 
+  /**
+   * Clear the search query so all notes can be shown again.
+   */
   function handleClear() {
-    setQuery("");
     onSearch("");
   }
 
   return (
-    <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700">
+    <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-secondary-bg text-foreground border border-primary-border focus-within:border-accent">
       {/* Search icon */}
       <Icon icon="material-symbols:search-rounded"/>
 
@@ -29,15 +35,17 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
         type="text"
         value={query}
         onChange={handleChange}
+        aria-label="Search notes"
         placeholder="Search notes..."
-        className="flex-1 bg-transparent text-sm outline-none text-neutral-800 dark:text-neutral-100 placeholder:text-neutral-400"
+        className="min-w-0 flex-1 bg-transparent text-sm outline-none text-foreground placeholder:text-muted-foreground"
       />
 
       {/* Clear button — only shows when there is text */}
       {query.length > 0 && (
         <button
+          aria-label="Clear search"
           onClick={handleClear}
-          className="text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 text-xs"
+          className="text-muted-foreground hover:text-foreground text-xs"
         >
           ✕
         </button>

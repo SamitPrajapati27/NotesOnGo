@@ -1,63 +1,124 @@
 @import "tailwindcss";
+@import "./ButtonStyle.css";
+
+@custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  --theme-main-bg: #fafafa;
-  --theme-main-color: #171717;
+  --theme-main-bg: var(--color-zinc-50);
+  --theme-main-color: var(--color-neutral-900);
   --theme-main-radius: var(--radius-md);
   --theme-border-color: var(--color-zinc-200);
-  --primary-bg: #f8f9fb;
-  --secondary-bg: #fafaf9;
-  --primary-border: #e5e7eb;
+  --primary-bg: var(--color-zinc-100);
+  --secondary-bg: var(--color-stone-50);
+  --primary-border: var(--color-zinc-200);
   --accent: #c4b5fd;
-  --dark-primary-bg: #6b7280;
-  --dark-primary-border: #374151;
+  --accent-foreground: var(--color-neutral-900);
+  --muted-foreground: var(--color-stone-600);
+  --dark-primary-bg: var(--color-zinc-700);
+  --dark-primary-border: var(--color-zinc-600);
 }
 
 @theme inline {
   --color-background: var(--theme-main-bg);
   --color-foreground: var(--theme-main-color);
-  --font-sans: var(--font-ibm-serif);
+  --font-sans: Arial, Helvetica, sans-serif;
   --font-mono: var(--font-gamja);
   --color-border: var(--theme-border-color);
   --color-primary-bg: var(--primary-bg);
   --color-secondary-bg: var(--secondary-bg);
   --color-primary-border: var(--primary-border);
   --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-muted-foreground: var(--muted-foreground);
   --color-dark-primary-bg: var(--dark-primary-bg);
   --color-dark-primary-border: var(--dark-primary-border);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--theme-main-bg);
+  color: var(--theme-main-color);
   font-family: Arial, Helvetica, sans-serif;
 }
 .dark {
-  --primary-bg: var(--color-zinc-600);
-  background: var(--color-zinc-800);
-  color: white;
-  --primary-border: var(--color-zinc-600);
-  --secondary-bg: var(--color-stone-700);
+  --theme-main-bg: var(--color-neutral-900);
+  --theme-main-color: var(--color-stone-50);
+  --primary-bg: var(--dark-primary-bg);
+  --secondary-bg: var(--color-zinc-800);
+  --primary-border: var(--dark-primary-border);
+  --theme-border-color: var(--primary-border);
+  --muted-foreground: var(--color-stone-300);
 }
 .popup {
-  @apply flex w-full justify-between rounded-lg border border-primary-border p-4 overflow-hidden;
+  @apply flex items-center gap-3 w-full justify-between rounded-lg border border-primary-border p-4 overflow-hidden;
 }
 .popup-row {
-  @apply bg-zinc-100 dark:bg-zinc-700;
+  @apply bg-secondary-bg text-foreground;
 }
 
-.popup-row:nth-child(2) {
-  @apply bg-zinc-200 dark:bg-zinc-700;
+.toggle-track {
+  width: var(--toggle-width);
+  height: var(--toggle-height);
+  box-shadow: inset 0 1px 3px
+    color-mix(in srgb, var(--color-neutral-950) 15%, transparent);
 }
-
-.popup-row:nth-child(3) {
-  @apply bg-zinc-300 dark:bg-zinc-800;
+.toggle-thumb {
+  width: calc(var(--toggle-height) - 4px);
+  height: calc(var(--toggle-height) - 4px);
+  top: 2px;
+  left: 2px;
 }
-
-.popup-row:nth-child(4) {
-  @apply bg-zinc-400 dark:bg-zinc-800;
+.peer:checked + .toggle-track .toggle-thumb {
+  transform: translateX(calc(var(--toggle-width) - var(--toggle-height)));
 }
-
-.popup-row:nth-child(5) {
-  @apply bg-zinc-500 dark:bg-zinc-900;
+[data-note-file] {
+  transition:
+    background 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+[data-note-file]:hover,
+[data-note-file]:focus-within {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 8%, var(--secondary-bg));
+}
+[data-note-file] > button {
+  cursor: pointer;
+  min-height: 30px;
+}
+[data-note-file] > button:focus-visible {
+  outline: 2px solid var(--accent);
+  border-radius: 4px;
+}
+input[aria-label="Note title"] {
+  transition:
+    background 180ms ease,
+    box-shadow 180ms ease;
+  border-radius: inherit;
+}
+input[aria-label="Note title"]:focus-visible {
+  box-shadow: 0 0 0 2px var(--accent);
+}
+.popup-enter {
+  animation: popup-in 180ms ease-out;
+}
+@keyframes popup-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .toggle-track,
+  .toggle-thumb,
+  [data-note-file],
+  input[aria-label="Note title"] {
+    transition: none;
+  }
+  .popup-enter {
+    animation: none;
+  }
 }

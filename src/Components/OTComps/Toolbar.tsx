@@ -1,32 +1,44 @@
 "use client";
-import { useState, useRef } from "react";
-import { useSlate,ReactEditor, Slate } from "slate-react";
+import { useState } from "react";
+import { useSlate, ReactEditor } from "slate-react";
 import Button from "@/src/Components/MTComps/Button";
 import DropButton from "@/src/Components/MTComps/DropButton";
-import { Editor, Transforms } from "slate";
-import { isMarkActive,isBlockActive,clearFormat, changeIndent} from "@/src/scripts/engine";
-import {createListDropdown,TBFontsDDD,createHeadingDropdown} from "@/src/scripts/setup";
-export default function Toolbar() {
+import { toggleMark as applyMark, type Mark } from "@/src/scripts/formatting";
+import { isMarkActive, clearFormat, changeIndent } from "@/src/scripts/engine";
+import {
+  createListDropdown,
+  createFontDropdown,
+  createHeadingDropdown,
+} from "@/src/scripts/setup";
+import type { SettingData } from "@/src/types/BasicTypes";
+/**
+ * Render formatting controls connected to the active Slate editor and note font.
+ */
+export default function Toolbar({
+  font,
+  onFontChange,
+  onLink,
+}: {
+  font: SettingData["font"];
+  onFontChange: (font: SettingData["font"]) => void;
+  onLink: () => void;
+}) {
   const [openDropdown, setOpenDropdown] = useState<string>("");
   const editor = useSlate();
-  const toggleMark = (format: string) => {
-    const isActive = isMarkActive(editor, format);
-    const selection = editor.selection;
-    if (!selection) return;
-    if (isActive) {
-      Editor.removeMark(editor, format);
-    } else {
-      Editor.addMark(editor, format, true);
-    }
-    Transforms.select(editor, selection);
-    ReactEditor.focus(editor)
+  /**
+   * Toggle the selected text mark, then restore the selection and editor focus.
+   */
+  const toggleMark = (format: Mark) => {
+    applyMark(editor, format);
+    ReactEditor.focus(editor);
   };
   const heads = createHeadingDropdown(editor),
-        lists = createListDropdown(editor);
+    lists = createListDropdown(editor);
   return (
-    <div
-      className="p-1 rounded-md md:my-3 border-primary-border border divide-x divide-primary-border size-fit mx-auto flex items-center justify-between ">
-      <div className="">
+    <div role="toolbar" aria-label="Text formatting"
+      onMouseDown={(event) => { if ((event.target as HTMLElement).closest("button")) event.preventDefault(); }}
+      className="p-1 rounded-xl mb-3 border-primary-border border max-w-full w-fit mx-auto flex flex-wrap gap-1 items-center justify-center ">
+      <div className="flex shrink-0 gap-1">
         <Button
           icon="material-symbols:format-bold-rounded"
           action={() => {
@@ -34,6 +46,7 @@ export default function Toolbar() {
           }}
           type="normal"
           tooltip="bold"
+          pressed={isMarkActive(editor, "bold")}
         />
         <Button
           icon="material-symbols:format-italic-rounded"
@@ -42,12 +55,14 @@ export default function Toolbar() {
           }}
           type="normal"
           tooltip="italic"
+          pressed={isMarkActive(editor, "italic")}
         />
         <Button
           icon="material-symbols:format-underlined-rounded"
           action={() => toggleMark("underline")}
           type="normal"
           tooltip="underline"
+          pressed={isMarkActive(editor, "underline")}
         />
       </div>
       <DropButton
@@ -60,9 +75,9 @@ export default function Toolbar() {
       />
       <DropButton
         id="fonts"
-        text={"Default"}
+        text={font}
         tooltip="fonts"
-        data={TBFontsDDD}
+        data={createFontDropdown(onFontChange)}
         isOpen={openDropdown === "fonts"}
         onToggle={setOpenDropdown}
       />
@@ -74,18 +89,23 @@ export default function Toolbar() {
         isOpen={openDropdown === "lists"}
         onToggle={setOpenDropdown}
       />
-      <div className="">
+      <div className="flex shrink-0 gap-1">
         <Button
           icon="material-symbols:format-indent-decrease-rounded"
-          action={() => changeIndent(editor,"decrease")}
+          action={() => changeIndent(editor, "decrease")}
           type="normal"
           tooltip="Decrease-indent"
         />
         <Button
           icon="material-symbols:format-indent-increase-rounded"
-          action={() => changeIndent(editor,"increase")}
+          action={() => changeIndent(editor, "increase")}
           type="normal"
           tooltip="Increase-indent"
+        />
+        <Button
+          icon="material-symbols:link-rounded"
+          action={onLink}
+          tooltip="Insert link (⌘K)"
         />
         <Button
           icon="material-symbols:format-clear-rounded"

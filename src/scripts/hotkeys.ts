@@ -1,77 +1,46 @@
-import { toggleBlock } from "./engine";
-import { Element, Editor, Transforms } from "slate";
+import { Editor, Element, Range, Transforms } from "slate";
+import { HistoryEditor } from "slate-history";
+import { toggleBlock, toggleMark, type Mark } from "./formatting.ts";
 
-export function handleKeyDown(event: React.KeyboardEvent, editor: Editor) {
-  // 1. Filter out keys we don't care about immediately
-  if (event.key !== "Backspace" && event.key !== "Enter") return;
-  // 2. Find the generic active block node where the cursor is sitting
-  const [match] = Editor.nodes(editor, {
-    match: (n) => Element.isElement(n) && !editor.isInline(n),
-    mode: "lowest",
-  });
+type KeyEvent = Pick<React.KeyboardEvent, "key" | "metaKey" | "ctrlKey" | "shiftKey" | "altKey" | "preventDefault">;
 
-  if (!match) return;
-  const [node, path] = match;
-  // =========================================================
-  // BACKSPACE KEY BEHAVIOR
-  // =========================================================
-  if (event.key === "Backspace") {
-    // Only intercept backspace if we are inside an EMPTY list item
-    const isListItem = Element.isElement(node) && node.type === "list-item";
-    const isEmpty = Editor.string(editor, path) === "";
-
-    if (isListItem && isEmpty) {
+/** Handle formatting, history, heading breaks, and exits from empty list or task items. */
+export function handleKeyDown(event: KeyEvent, editor: Editor) {
+  if (!editor.selection) return;
+  if ((event.metaKey || event.ctrlKey) && !event.altKey) {
+    const key = event.key.toLowerCase();
+    const mark = ({ b: "bold", i: "italic", u: "underline" } as Record<string, Mark>)[key];
+    if (mark) { event.preventDefault(); toggleMark(editor, mark); return; }
+    if (HistoryEditor.isHistoryEditor(editor) && (key === "z" || key === "y")) {
       event.preventDefault();
-      toggleBlock(editor, "bulleted-list"); // Assuming this unwraps the list
+      if (key === "y" || event.shiftKey) HistoryEditor.redo(editor);
+      else HistoryEditor.undo(editor);
+      return;
     }
+  }
+  if (event.key !== "Backspace" && event.key !== "Enter") return;
+  if (event.shiftKey || event.altKey || event.metaKey || event.ctrlKey) return;
+  const [match] = Editor.nodes(editor, {
+    match: (node) => Element.isElement(node) && !editor.isInline(node), mode: "lowest",
+  });
+  if (!match || !Element.isElement(match[0])) return;
+  const [node, path] = match;
+  const item = node.type === "list-item" || node.type === "task-item";
+  if (item && Range.isCollapsed(editor.selection) && Editor.string(editor, path) === "") {
+    event.preventDefault();
+    toggleBlock(editor, "paragraph");
     return;
   }
-
-  // =========================================================
-  // ENTER KEY BEHAVIOR
-  // =========================================================
-  if (event.key === "Enter") {
-    // SCENARIO A: User presses Enter on a heading block
-    const isHeading =
-      Element.isElement(node) &&
-      ["heading-one", "heading-two", "heading-three"].includes(node.type);
-
-    if (isHeading) {
-      event.preventDefault(); // Stop Slate from copying the heading format
-
-      // Force insert a clean paragraph underneath
-      Transforms.insertNodes(editor, {
-        type: "paragraph",
-        children: [{ text: "" }],
+  if (event.key === "Enter" && (["heading-one", "heading-two", "heading-three"].includes(node.type) || node.type === "task-item")) {
+    event.preventDefault();
+    /** Split at the cursor so text after it moves into the new paragraph or unchecked task. */
+    const split = () => Editor.withoutNormalizing(editor, () => {
+      Editor.insertBreak(editor);
+      Transforms.setNodes(editor, node.type === "task-item" ? { checked: false } : { type: "paragraph" }, {
+        match: (candidate) => Element.isElement(candidate) && !editor.isInline(candidate), mode: "lowest",
       });
-      return;
-    }
-
-    // SCENARIO B: User presses Enter on an EMPTY list item
-    const isListItem = Element.isElement(node) && node.type === "list-item";
-    const isEmpty = Editor.string(editor, path) === "";
-
-    if (isListItem && isEmpty) {
-      event.preventDefault(); // Stop Slate from creating another bullet
-
-      // Convert the line to a normal paragraph block
-      Transforms.setNodes(editor, {
-        type: "paragraph",
-      });
-
-      // Break it out of the container layout structure
-      Transforms.unwrapNodes(editor, {
-        match: (n) =>
-          Element.isElement(n) &&
-          [
-            "bulleted-list",
-            "numbered-list",
-            "letter-list",
-            "task-list",
-          ].includes(n.type),
-        split: true,
-      });
-      return;
-    }
+    });
+    if (HistoryEditor.isHistoryEditor(editor)) HistoryEditor.withNewBatch(editor, split);
+    else split();
   }
 }

@@ -1,19 +1,20 @@
-import { BaseEditor } from "slate";
-import { ReactEditor } from "slate-react";
+import type { CSSProperties } from "react";
+import type { BaseEditor } from "slate";
+import type { ReactEditor } from "slate-react";
 
-export type CustomElement =
-  | { type: "paragraph"; children: any[] }
-  | { type: "heading-one"; children: any[] }
-  | { type: "heading-two"; children: any[] }
-  | { type: "heading-three"; children: any[] }
-  | { type: "numbered-list"; children: any[] }
-  | { type: "bulleted-list"; children: any[] }
-  | { type: "letter-list"; children: any[] }
-  | { type: "task-list"; children: any[] }
-  | { type: "task-item"; checked: boolean; children: any[] }
-  | { type: "list-item"; children: any[] };
+export type CustomElement = {
+  type: "paragraph" | "heading-one" | "heading-two" | "heading-three"
+    | "numbered-list" | "bulleted-list" | "letter-list" | "task-list"
+    | "task-item" | "list-item" | "link";
+  url?: string;
+  children: (CustomElement | CustomText)[];
+  checked?: boolean;
+  indent?: number;
+  align?: CSSProperties["textAlign"];
+};
 
 export type CustomText = {
+  text: string;
   bold?: boolean;
   italic?: boolean;
   underline?: boolean;

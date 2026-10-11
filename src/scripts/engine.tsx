@@ -1,12 +1,15 @@
 import {
   RenderLeafProps,
-  useSlate,
   RenderElementProps,
   ReactEditor,
   useSlateStatic,
 } from "slate-react";
-import { Editor, Element, Transforms } from "slate";
+import { Editor, Transforms } from "slate";
 import Button from "@/src/Components/MTComps/Button";
+import { normalizeLinkUrl } from "./urls";
+/**
+ * Render a Slate text leaf with its bold, italic, and underline marks.
+ */
 export const renderLeaf = ({ attributes, children, leaf }: RenderLeafProps) => {
   let style = "";
   if (leaf.bold) {
@@ -22,19 +25,11 @@ export const renderLeaf = ({ attributes, children, leaf }: RenderLeafProps) => {
   return <span {...attributes} className={style}>{children}</span>;
 };
 
-export function isMarkActive(editor: Editor, format: string) {
-  const marks = Editor.marks(editor);
-  if (!marks) return;
-  return marks ? marks[format] === true : false;
-}
+export { isMarkActive, isBlockActive, toggleBlock, toggleList, toggleHeading, clearFormat, changeIndent } from "./formatting";
 
-export function isBlockActive(editor: Editor, format: string) {
-  const [match] = Editor.nodes(editor, {
-    match: (n) => Element.isElement(n) && n.type === format,
-  });
-  return !!match;
-}
-
+/**
+ * Log a requested format for the legacy dropdown placeholder; no editor changes are applied.
+ */
 export function formatBlocks(args: string) {
   console.log(args);
   return null;
@@ -45,9 +40,12 @@ interface BlockWrapperProps extends RenderElementProps {
   children: React.ReactNode;
 }
 
+/**
+ * Wrap children with element indentation and alignment; the active renderer does not use this wrapper.
+ */
 export const BlockWrapper = ({ element, children }: BlockWrapperProps) => {
-  const indent = (element as any).indent || 0;
-  const align = (element as any).align || "left";
+  const indent = element.indent || 0;
+  const align = element.align || "left";
   const style: React.CSSProperties = {
     paddingLeft: indent > 0 ? `${indent * 24}px` : undefined,
     textAlign: align !== "left" ? align : undefined,
@@ -55,11 +53,34 @@ export const BlockWrapper = ({ element, children }: BlockWrapperProps) => {
   return <div style={style}>{children}</div>;
 };
 
-export const renderElement = (props: RenderElementProps) => {
-  const { attributes, children, element } = props;
+/**
+ * Render supported Slate block and link elements, including interactive task checkboxes.
+ */
+export const RenderElement = (props: RenderElementProps & { onEditLink?: () => void }) => {
+  const { children, element } = props;
+  const attributes = {
+    ...props.attributes,
+    style: element.type === "link" ? undefined : {
+      marginLeft: element.indent ? `${element.indent * 24}px` : undefined,
+      textAlign: element.align,
+    },
+  };
   const editor = useSlateStatic();
+  /**
+   * Choose the HTML element and interaction handlers for the current Slate element type.
+   */
   const innerEle = () => {
     switch (element.type) {
+      case "link":
+        return <a {...attributes} href={normalizeLinkUrl(element.url || "") || undefined} target="_blank" rel="noopener noreferrer"
+          title="Click to edit; ⌘/Ctrl-click to open" className="underline decoration-accent underline-offset-2 cursor-pointer hover:bg-accent/20 rounded-sm"
+          onClick={(event) => {
+            if (event.metaKey || event.ctrlKey) return;
+            event.preventDefault();
+            const path = ReactEditor.findPath(editor, element);
+            Transforms.select(editor, Editor.range(editor, path));
+            props.onEditLink?.();
+          }}>{children}</a>;
       case "paragraph":
         return <p {...attributes}>{children}</p>;
       case "heading-one":
@@ -117,6 +138,7 @@ export const renderElement = (props: RenderElementProps) => {
       case "task-item":
         return (
           <li {...attributes} className="space-x-2">
+            <span contentEditable={false} onMouseDown={(event) => event.preventDefault()} className="inline-flex align-middle">
             <Button
               icon={
                 element.checked
@@ -132,8 +154,9 @@ export const renderElement = (props: RenderElementProps) => {
                 );
               }}
               type="normal"
-              tooltip=""
+              tooltip={element.checked ? "Mark incomplete" : "Mark complete"}
             />
+            </span>
             <span className={element.checked ? "line-through" : ""}>
               {children}
             </span>
@@ -145,110 +168,5 @@ export const renderElement = (props: RenderElementProps) => {
   };
   return (
       innerEle()
-  );
-};
-
-const LIST_TYPES = [
-  "numbered-list",
-  "bulleted-list",
-  "letter-list",
-  "task-list",
-];
-
-export function toggleBlock(editor: Editor, format: string) {
-  const isActive = isBlockActive(editor, format);
-  
-  Transforms.setNodes(
-    editor,
-    { type: isActive ? 'paragraph' : format },
-    { match: n => Element.isElement(n) && !Editor.isEditor(n) }
-  );
-}
-
-export function toggleList(editor: Editor, format: string) {
-  const isActive = isBlockActive(editor, format);
-  const isList = ['numbered-list', 'bulleted-list','task-list'].includes(format);
-  const isTask = ['task-list'].includes(format);
-
-  // Unwrap any existing list structures first
-  Transforms.unwrapNodes(editor, {
-    match: n =>
-      !Editor.isEditor(n) &&
-      Element.isElement(n) &&
-      ['numbered-list', 'bulleted-list', 'task-list'].includes(n.type),
-    split: true,
-  });
-
-  // Turn the current block into a list-item if activating, or paragraph if deactivating
-  Transforms.setNodes(
-    editor,
-    { type: isActive ? 'paragraph' : isList ? isTask? 'task-item' : 'list-item' : format },
-    { match: n => Element.isElement(n) && !Editor.isEditor(n) }
-  );
-
-  // If activating, wrap the list items in the parent list container
-  if (!isActive && isList) {
-    const block = { type: format, children: [] };
-    Transforms.wrapNodes(editor, block);
-  }
-}
-
-export function toggleHeading(editor: Editor, format: string) {
-  // Headings behave just like standard blocks (toggle between the heading level and paragraph)
-  toggleBlock(editor, format);
-}
-export function clearFormat(editor: Editor) {
-  Transforms.unwrapNodes(editor, {
-    match: (n) => Element.isElement(n) && LIST_TYPES.includes(n.type),
-    split: true,
-  });
-
-  Transforms.setNodes(editor, {
-    type: "paragraph",
-    indent: 0,
-    align: 0,
-  } as any);
-
-  if (editor.selection) {
-    const marks = Editor.marks(editor);
-    if (marks) {
-      Object.keys(marks).forEach((mark) => {
-        Editor.removeMark(editor, mark);
-      });
-    }
-  }
-}
-
-export const changeIndent = (
-  editor: Editor,
-  operation: "increase" | "decrease",
-) => {
-  if (!editor.selection) return;
-
-  const selection = Editor.unhangRange(editor, editor.selection);
-  const [match] = Editor.nodes(editor, {
-    at: selection,
-    match: (n) => Element.isElement(n) && !editor.isInline(n),
-    mode: "lowest",
-  });
-
-  if (!match) return;
-  const [node, path] = match;
-
-  const currentIndent = (node as any).indent || 0;
-
-  let newIndent =
-    operation === "increase" ? currentIndent + 1 : currentIndent - 1;
-  if (newIndent < 0) newIndent = 0;
-  else if (newIndent >= 32) newIndent = 31;
-  Transforms.setNodes(
-    editor,
-    {
-      indent: newIndent === 0 ? undefined : newIndent,
-    } as any,
-    {
-      at: selection,
-      match: (n) => Element.isElement(n) && !editor.isInline(n),
-    },
   );
 };

@@ -1,13 +1,14 @@
 import { DropdownData, shortcutData, SettingData } from "../types/BasicTypes";
-import { formatBlocks, toggleBlock, toggleHeading, toggleList } from "./engine";
+import { formatBlocks, toggleHeading, toggleList } from "./engine";
 import { useState } from "react";
-import { Editor } from "slate";
+import { Editor, Element } from "slate";
 /**
- * Used for Creating DDD date on the fly
- * @param tooltip
- * @param icon
- * @param text
- * @returns
+ * Build a dropdown item, using its tooltip as the fallback display text.
+ * @param tooltip Accessible description of the action.
+ * @param action Callback invoked when the item is selected.
+ * @param icon Optional Iconify icon identifier.
+ * @param text Optional display text overriding the tooltip.
+ * @returns A menu item ready for the shared dropdown component.
  */
 function ezCreateDDD(
   tooltip: string,
@@ -25,11 +26,15 @@ function ezCreateDDD(
 }
 
 // Used for Settings //
+/**
+ * Initialize session-only display preferences and expose their state setter.
+ */
 export function useSettings(){
     const [settings, setSettings] = useState<SettingData>({
       accent: "purple",
       font: "Default",
       spacing: 10,
+      toolTip: true,
     });
     return {settings, setSettings};
 }
@@ -44,6 +49,9 @@ export const dropdownListIcons = [
 export const TBListDDD: DropdownData[] = dropdownListIcons.map((icon) =>
   ezCreateDDD(icon[1], () => formatBlocks(icon[1]), icon[0], undefined),
 );
+/**
+ * Build bullet, numbered, and task-list actions for the supplied Slate editor.
+ */
 export function createListDropdown(editor: Editor): DropdownData[] {
   return [
     [
@@ -61,7 +69,7 @@ export function createListDropdown(editor: Editor): DropdownData[] {
     ezCreateDDD(
       item[1],
       () => {
-        toggleList(editor, item[2]);
+        toggleList(editor, item[2] as Element["type"]);
       },
       item[0],
       undefined,
@@ -69,6 +77,9 @@ export function createListDropdown(editor: Editor): DropdownData[] {
   );
 }
 
+/**
+ * Build heading-level and normal-text actions for the supplied Slate editor.
+ */
 export function createHeadingDropdown(editor: Editor): DropdownData[] {
   return [
     ["Heading 1", "heading-one"],
@@ -79,22 +90,36 @@ export function createHeadingDropdown(editor: Editor): DropdownData[] {
     ezCreateDDD(
       item[0],
       () => {
-        toggleHeading(editor, item[1]);
-        console.log("Clicked Format");
+        toggleHeading(editor, item[1] as Element["type"]);
+
       },
       undefined,
       item[0],
     ),
   );
 }
-export const TBFontsDDD: DropdownData[] = ["Default", "Elegant", "Fun"].map(
-  (font) => ezCreateDDD(font, () => formatBlocks(font), undefined, font),
-);
+/**
+ * Build font choices that call the parent’s font-change callback.
+ */
+export function createFontDropdown(onChange: (font: SettingData["font"]) => void): DropdownData[] {
+  return (["Default", "Elegant", "Fun"] as const).map(
+    (font) => ezCreateDDD(font, () => onChange(font), undefined, font),
+  );
+}
 
 // Popups //
+/**
+ * Manage a dialog’s visibility and expose its title, open/close actions, and shared props.
+ */
 export function usePopup(title: string) {
   const [isOpen, setIsOpen] = useState(false);
+  /**
+   * Open the dialog controlled by this hook.
+   */
   const open = () => setIsOpen(true);
+  /**
+   * Close the dialog controlled by this hook.
+   */
   const close = () => setIsOpen(false);
   return {
     isOpen,
@@ -112,23 +137,25 @@ export type PopupController = ReturnType<typeof usePopup>;
 
 export const shortcuts: Array<shortcutData> = [
   {
-    shortcut: "⌘ + B",
+    shortcut: "⌘ / Ctrl + B",
     action: "Bold",
   },
   {
-    shortcut: "⌘ + I",
+    shortcut: "⌘ / Ctrl + I",
     action: "Italic",
   },
   {
-    shortcut: "⌘ + U",
+    shortcut: "⌘ / Ctrl + U",
     action: "Underline",
   },
+  { shortcut: "⌘ / Ctrl + K", action: "Insert or edit link" },
+  { shortcut: "⌘ / Ctrl + Z", action: "Undo" },
+  { shortcut: "⌘ / Ctrl + Shift + Z", action: "Redo" },
 ];
 
-export const PUExportDDD: DropdownData[] = ["md", "txt", "json"].map((text) =>
-  ezCreateDDD(text, () => formatBlocks(text), undefined, text),
-);
-
+/**
+ * Count contiguous Unicode letter, number, and combining-mark groups in trimmed text.
+ */
 export function getWordCount(text: string): number {
   const trimmed = text.trim();
   if (!trimmed) return 0;

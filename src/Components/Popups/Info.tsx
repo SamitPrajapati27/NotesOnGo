@@ -1,5 +1,8 @@
 "use client";
 import { shortcuts } from "@/src/scripts/setup";
+/**
+ * Display the keyboard shortcuts listed in the application’s shortcut configuration.
+ */
 export default function Info() {
   return (
     <div className="">

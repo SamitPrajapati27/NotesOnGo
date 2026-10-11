@@ -1,4 +1,5 @@
 import { ReactNode, Dispatch, SetStateAction } from "react";
+import type { Descendant } from "slate";
 
 //Buttons Types//
 export type DropdownData = {
@@ -17,6 +18,7 @@ export type DropdownObject = {
   onToggle?: (id: string) => void;
   id?: string;
   pos?: 'up' | 'down' | 'left' | 'right';
+  menuDirection?: "up" | "down";
 };
 
 export type ButtonObject = {
@@ -27,11 +29,17 @@ export type ButtonObject = {
   type?: 'normal' | 'last' | 'dropdown' | 'dropdown-open';
   position?: 'up' | 'down' | 'left' | 'right';
   extra?: string;
+  fullWidth?: boolean;
+  pressed?: boolean;
+  feedback?: "saved" | "unsaved";
+  htmlType?: "button" | "submit";
 };
 
 export type ToggleObject = {
   checked: boolean;
   action: () => void;
+  label?: string;
+  size?: "sm" | "md" | "lg";
 }
 
 //Settings//
@@ -62,7 +70,7 @@ export type Accent = keyof typeof accents;
 export type SettingData = {
   accent: Accent;
   font: "Default" | "Elegant" | "Fun";
-  spacing: Number;
+  spacing: number;
   toolTip: boolean;
 }
 export const settingsOptions = {
@@ -86,8 +94,12 @@ export type PopupProps = {
 };
 
 export type NoteData = {
+  id: string;
   title: string;
-  data: Array<String>;
+  data: Descendant[];
+  createdAt: string;
+  updatedAt: string;
+  font?: SettingData["font"];
 }
 
 export type shortcutData = {

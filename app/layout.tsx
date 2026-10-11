@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Serif, Gamja_Flower } from "next/font/google";
 import "./globals.css";
+import AppErrors from "@/src/Components/Errors/AppErrors";
 export const ibmPlexSerif = IBM_Plex_Serif({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
@@ -17,6 +18,9 @@ export const metadata: Metadata = {
   description: "Note taking website to improve your noting taking notes!",
 };
 
+/**
+ * Provide the shared HTML layout, global styles, and editor font variables.
+ */
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -25,8 +29,8 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${gamjaFlower.variable} ${gamjaFlower.variable} h-full antialiased`}>
-      <body className="h-full flex flex-col">{children}</body>
+      className={`${ibmPlexSerif.variable} ${gamjaFlower.variable} h-full antialiased`}>
+      <body className="h-full flex flex-col"><AppErrors>{children}</AppErrors></body>
     </html>
   );
 }

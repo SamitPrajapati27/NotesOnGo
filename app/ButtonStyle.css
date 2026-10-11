@@ -1,79 +1,31 @@
-@import "tailwindcss";
-@import "./globals.css";
-
+/* Original neutral controls and accent hover colors. */
 .btn {
-  @apply p-0.5 !text-sm md:text-lg md:p-1 rounded-md transition-colors duration-300 ease-in-out border border-transparent hover:bg-accent dark:hover:text-black cursor-pointer;
+  @apply relative inline-flex items-center justify-center rounded-md cursor-pointer text-foreground border border-transparent;
+  min-width: 32px;
+  min-height: 32px;
+  padding: 4px 6px;
+  transition: background-color 180ms ease, border-color 180ms ease, transform 120ms ease;
 }
-
-.btn-full{
-  @apply bg-primary-bg border border-primary-border!;
+.btn:hover { background: var(--accent); color: var(--accent-foreground); }
+.btn:active { transform: scale(0.96); }
+.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.btn-full { background: var(--primary-bg); border-color: var(--primary-border); }
+.btn-last { border-right: 2px solid var(--primary-border); border-radius: 0; }
+.btn-half { border-radius: 6px 0 0 6px; }
+.btn-radio { border-radius: 50%; border-color: var(--primary-border); background: var(--secondary-bg); }
+.btn-display { border-radius: 16px; }
+.btn[aria-pressed="true"], .btn[aria-expanded="true"], .btn[data-feedback="saved"] {
+  background: var(--accent); color: var(--accent-foreground);
 }
-
-.btn-last {
-  @apply border-r-2 rounded-none border-zinc-200;
+.btn-content { position: relative; }
+.unsaved-dot {
+  position: absolute; top: 3px; right: 3px; width: 5px; height: 5px;
+  border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 1px var(--secondary-bg);
 }
-
-.btn-half {
-  @apply rounded-l-md;
-}
-
-.btn-radio {
-  @apply rounded-full border border-zinc-200 bg-white;
-}
-
-.btn-display {
-  @apply rounded-2xl text-black;
-}
-
 .tooltip {
-  @apply absolute z-10 whitespace-nowrap rounded bg-black text-white text-sm px-1 py-0.5;
+  @apply fixed z-[1000] pointer-events-none max-w-[calc(100vw-1rem)] break-words rounded bg-neutral-900 text-neutral-50 border border-zinc-600 text-sm px-2 py-1 shadow-md;
 }
-
-.tooltip-up {
-  @apply left-1/2 -translate-x-1/2 mb-2 bottom-full;
-}
-
-.tooltip-down {
-  @apply left-1/2 -translate-x-1/2 mt-2 top-full;
-}
-
-.tooltip-left {
-  @apply right-full mr-2 top-1/2 -translate-y-1/2;
-}
-
-.tooltip-right {
-  @apply left-full ml-2 top-1/2 -translate-y-1/2;
-}
-
-.tooltip::after {
-  content: "";
-  position: absolute;
-  width: 0.35rem;
-  height: 0.35rem;
-  background: #000;
-  transform: rotate(45deg);
-}
-
-.tooltip-down::after {
-  top: -0.125rem;
-  left: 50%;
-  transform: translateX(-50%) rotate(45deg);
-}
-
-.tooltip-up::after {
-  bottom: -0.125rem;
-  left: 50%;
-  transform: translateX(-50%) rotate(45deg);
-}
-
-.tooltip-left::after {
-  right: -0.125rem;
-  top: 50%;
-  transform: translateY(-50%) rotate(45deg);
-}
-
-.tooltip-right::after {
-  left: -0.125rem;
-  top: 50%;
-  transform: translateY(-50%) rotate(45deg);
+@media (prefers-reduced-motion: reduce) {
+  .btn { transition: none; }
+  .btn:active { transform: none; }
 }

@@ -1,21 +1,45 @@
+import Toggle from "../MTComps/Toggle";
 import Button from "../MTComps/Button";
 import { PopupController } from "@/src/scripts/setup";
+import { useEffect, useState } from "react";
 type UtilityProps = {
   setExportPopup: PopupController;
   setInfoPopup: PopupController;
+  onSave: () => boolean;
+  autosave: boolean;
+  dirty: boolean;
+  onToggleAutosave: () => void;
 };
 
+/**
+ * Render autosave, manual save, export, and help controls with temporary save confirmation.
+ */
 export default function Utility({
   setExportPopup,
   setInfoPopup,
+  onSave,
+  autosave,
+  dirty,
+  onToggleAutosave,
 }: UtilityProps) {
+  const [confirmation, setConfirmation] = useState(0);
+  useEffect(() => {
+    if (!confirmation) return;
+    const timer = window.setTimeout(() => setConfirmation(0), 1800);
+    return () => window.clearTimeout(timer);
+  }, [confirmation]);
+  const saved = confirmation > 0 && !dirty;
   return (
-    <div className="space-x-1 md:mr-5 md:p-1">
+    <div className="flex flex-wrap items-center justify-end gap-1.5">
+      <div className="flex items-center justify-center gap-1.5 mr-2 min-h-8">
+          <span className="text-xs">Auto Save</span>
+          <Toggle checked={autosave} action={onToggleAutosave} label="Autosave" size="sm" />
+      </div>
+      <span role="status" aria-live="polite" className="sr-only">{saved ? "Note saved" : dirty ? "Unsaved changes" : ""}</span>
       <Button
         icon="material-symbols:save"
-        action={() => {
-          console.log("Test");
-        }}
+        action={() => { const success = onSave(); setConfirmation((value) => success ? value + 1 : 0); }}
+        feedback={saved ? "saved" : dirty ? "unsaved" : undefined}
         type="normal"
         tooltip="save"
         extra="!text-xl btn-full"
