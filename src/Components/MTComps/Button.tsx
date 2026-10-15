@@ -21,6 +21,7 @@ export default function Button({
   extra,
   fullWidth,
   pressed,
+  disabled = false,
   feedback,
   htmlType = "button",
 }: ButtonObject) {
@@ -72,6 +73,7 @@ export default function Button({
       className={`relative ${fullWidth ? "block w-full" : "inline-block"} font-sans`}>
       <button
         type={htmlType}
+        disabled={disabled}
         aria-label={tooltip || text}
         aria-pressed={pressed}
         aria-expanded={

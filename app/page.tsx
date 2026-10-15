@@ -9,6 +9,7 @@ import Utility from "@/src/Components/OTComps/Utility";
 import Setting from "@/src/Components/Popups/Setting";
 import Button from "@/src/Components/MTComps/Button";
 import Info from "@/src/Components/Popups/Info";
+import Import from "@/src/Components/Popups/Import";
 import Export from "@/src/Components/Popups/Export";
 import ErrorBoundary from "@/src/Components/Errors/ErrorBoundary";
 import NoteNotFound from "@/src/Components/Errors/NoteNotFound";
@@ -22,7 +23,8 @@ import { useNotes } from "@/src/scripts/saving";
 export default function Home() {
   const infoPopup = usePopup("Info"),
     settingsPopup = usePopup("Setting"),
-    exportPopup = usePopup("Import & Export");
+    exportPopup = usePopup("Export"),
+    importPopup = usePopup("Import");
   const [isSideBar, setSideBar] = useState(false);
   const notes = useNotes();
   const activeNote = notes.collection?.notes.find(
@@ -111,6 +113,7 @@ export default function Home() {
                 key={activeNote.id}
                 setInfoPopup={infoPopup}
                 setExportPopup={exportPopup}
+                setImportPopup={importPopup}
                 onSave={notes.save}
                 autosave={notes.autosave}
                 dirty={notes.dirty}
@@ -161,16 +164,18 @@ export default function Home() {
           />
         </Popup>
         <Popup
-          wide
           isOpen={exportPopup.isOpen}
           onClose={exportPopup.close}
           title={exportPopup.title}>
-          <Export
-            key={activeNote.id}
-            note={activeNote}
+          <Export key={activeNote.id} note={activeNote} />
+        </Popup>
+        <Popup
+          isOpen={importPopup.isOpen}
+          onClose={importPopup.close}
+          title={importPopup.title}>
+          <Import
             onImport={(imported) => {
               notes.importNotes(imported);
-              exportPopup.close();
             }}
           />
         </Popup>

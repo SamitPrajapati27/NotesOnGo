@@ -1,16 +1,7 @@
 "use client";
-import { shortcuts } from "@/src/scripts/setup";
+import { shortcuts, markdownGuide } from "@/src/scripts/setup";
 
-const markdown = [
-  ["**bold** or __bold__", "Bold"],
-  ["*italic* or _italic_", "Italic"],
-  ["***bold italic***", "Bold + italic"],
-  ["# / ## / ### + Space", "Headings 1–3"],
-  ["- / * / + + Space", "Bullet list"],
-  ["1. + Space", "Numbered list"],
-  ["[ ] / [x] + Space", "Task list"],
-  ["[text](https://…)", "Link"],
-];
+
 
 export default function Info({ markdownShortcuts = true }: { markdownShortcuts?: boolean }) {
   return <div className="space-y-7">
@@ -42,7 +33,7 @@ export default function Info({ markdownShortcuts = true }: { markdownShortcuts?:
             <tr><th scope="col" className="w-1/3 px-3 py-3 font-medium">Format</th><th scope="col" className="px-3 py-3 font-medium">What to type</th></tr>
           </thead>
           <tbody className="divide-y divide-primary-border">
-            {markdown.map(([syntax, label]) => <tr key={label}>
+            {markdownGuide.map(([syntax, label]) => <tr key={label}>
               <th scope="row" className="px-3 py-3 font-normal">{label}</th>
               <td className="px-3 py-3 [overflow-wrap:anywhere]"><code style={{ fontFamily: "monospace" }} className="text-xs">{syntax}</code></td>
             </tr>)}

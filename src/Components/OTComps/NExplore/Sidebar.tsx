@@ -115,7 +115,7 @@ export default function SideBar({
               type="normal"
               tooltip="New Note"
               position="down"
-              extra="!text-base w-full h-10"
+              extra="!text-base w-full h-10 btn-full"
             />
           </div>
         </div>
@@ -133,7 +133,7 @@ export default function SideBar({
             type="normal"
             tooltip="theme"
             position="left"
-            extra="!text-2xl "
+            extra="!text-2xl btn-full"
           />
           <Button
             icon="material-symbols:settings-outline"
@@ -143,7 +143,7 @@ export default function SideBar({
             type="normal"
             tooltip="settings"
             position="right"
-            extra="!text-2xl"
+            extra="!text-2xl btn-full"
           />
         </div>
       </section>

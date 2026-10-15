@@ -31,6 +31,7 @@ export type ButtonObject = {
   extra?: string;
   fullWidth?: boolean;
   pressed?: boolean;
+  disabled?: boolean;
   feedback?: "saved" | "unsaved";
   htmlType?: "button" | "submit";
 };

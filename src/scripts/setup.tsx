@@ -199,3 +199,53 @@ export function getWordCount(text: string): number {
 
   return words ? words.length : 0;
 }
+
+// Shared file transfer configuration.
+export const noteFileFormats = [
+  {
+    type: "md",
+    title: "Markdown",
+    detail: "Text with formatting",
+    icon: "material-symbols:markdown-outline-rounded",
+  },
+  {
+    type: "txt",
+    title: "Txt File",
+    detail: "Just the words",
+    icon: "material-symbols:description-outline-rounded",
+  },
+  {
+    type: "json",
+    title: "JSON",
+    detail: "Keep all note formatting",
+    icon: "material-symbols:inventory-2-outline-rounded",
+  },
+] as const;
+
+export const noteFileConfig = {
+  defaultFormat: "md",
+  defaultTitle: "Untitled Note",
+  maxFileBytes: 1_000_000,
+  maxBatchBytes: 5_000_000,
+} as const;
+export const noteFileAccept = noteFileFormats
+  .map((format) => `.${format.type}`)
+  .join(",");
+export const saveConfirmationDuration = 1800;
+
+export const markdownGuide = [
+  ["**bold** or __bold__", "Bold"],
+  ["*italic* or _italic_", "Italic"],
+  ["***bold italic***", "Bold + italic"],
+  ["# / ## / ### + Space", "Headings 1–3"],
+  ["- / * / + + Space", "Bullet list"],
+  ["1. + Space", "Numbered list"],
+  ["[ ] / [x] + Space", "Task list"],
+  ["[text](https://…)", "Link"],
+];
+
+export const toggleSizes = {
+  sm: { width: 36, height: 20 },
+  md: { width: 44, height: 24 },
+  lg: { width: 60, height: 32 },
+};

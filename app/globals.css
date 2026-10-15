@@ -49,7 +49,7 @@ body {
   --muted-foreground: var(--color-stone-300);
 }
 .popup {
-  @apply flex items-center gap-3 w-full justify-between rounded-lg border border-primary-border p-4 overflow-hidden;
+  @apply flex items-center gap-3 w-full justify-between rounded-lg border border-primary-border p-2 overflow-hidden;
 }
 .popup-row {
   @apply bg-secondary-bg text-foreground;

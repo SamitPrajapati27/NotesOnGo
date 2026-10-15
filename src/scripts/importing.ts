@@ -109,3 +109,26 @@ export function importNoteFile(filename: string, contents: string): NoteData[] {
   if (!isNote(note)) throw new Error(`${filename}: the document structure is not supported.`);
   return [note];
 }
+
+
+/** Read a complete selection atomically, keeping the queued batch within its limits. */
+export async function readNoteFiles(
+  files: readonly Pick<File, "name" | "size" | "text">[],
+  limits: { maxFileBytes: number; maxBatchBytes: number },
+  queuedBytes = 0,
+): Promise<{ notes: NoteData[]; bytes: number }> {
+  const bytes = files.reduce((total, file) => total + file.size, 0);
+  if (queuedBytes + bytes > limits.maxBatchBytes) {
+    throw new Error(`Select up to ${limits.maxBatchBytes / 1_000_000} MB of files at a time.`);
+  }
+  const batches = await Promise.all(files.map(async (file) => {
+    if (file.size > limits.maxFileBytes) {
+      throw new Error(`${file.name}: maximum file size is ${limits.maxFileBytes / 1_000_000} MB.`);
+    }
+    let contents: string;
+    try { contents = await file.text(); }
+    catch { throw new Error(`${file.name}: could not read this file. Please select it again.`); }
+    return importNoteFile(file.name, contents);
+  }));
+  return { notes: batches.flat(), bytes };
+}

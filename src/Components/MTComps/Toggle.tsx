@@ -1,13 +1,14 @@
+import { toggleSizes } from "@/src/scripts/setup";
 import type { CSSProperties } from "react";
 import type { ToggleObject } from "@/src/types/BasicTypes";
 
-const sizes = { sm: { width: 36, height: 20 }, md: { width: 44, height: 24 }, lg: { width: 60, height: 32 } };
+
 
 /**
  * Render a controlled checkbox switch using the requested track size.
  */
 export default function Toggle({ checked, action, label, size = "md" }: ToggleObject) {
-  const dimensions = sizes[size];
+  const dimensions = toggleSizes[size];
   const style = {
     "--toggle-width": `${dimensions.width}px`,
     "--toggle-height": `${dimensions.height}px`,

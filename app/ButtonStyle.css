@@ -4,28 +4,72 @@
   min-width: 32px;
   min-height: 32px;
   padding: 4px 6px;
-  transition: background-color 180ms ease, border-color 180ms ease, transform 120ms ease;
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    transform 120ms ease;
 }
-.btn:hover { background: var(--accent); color: var(--accent-foreground); }
-.btn:active { border-color: var(--accent); }
-.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.btn-full { background: var(--primary-bg); border-color: var(--primary-border); }
-.btn-last { border-right: 2px solid var(--primary-border); border-radius: 0; }
-.btn-half { border-radius: 6px 0 0 6px; }
-.btn-radio { border-radius: 50%; border-color: var(--primary-border); background: var(--secondary-bg); }
-.btn-display { border-radius: 16px; }
-.btn[aria-pressed="true"], .btn[aria-expanded="true"], .btn[data-feedback="saved"] {
-  background: var(--accent); color: var(--accent-foreground);
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
 }
-.btn-content { position: relative; }
+.btn:hover:not(:disabled) {
+  background: var(--accent);
+  color: var(--accent-foreground);
+}
+.btn:active {
+  border-color: var(--accent);
+}
+.btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.btn-full {
+  background: var(--primary-bg);
+  border-color: var(--primary-border);
+}
+.btn-last {
+  border-right: 2px solid var(--primary-border);
+  border-radius: 0;
+}
+.btn-half {
+  border-radius: 6px 0 0 6px;
+}
+.btn-radio {
+  border-radius: 50%;
+  border-color: var(--primary-border);
+  background: var(--secondary-bg);
+}
+.btn-display {
+  border-radius: 16px;
+}
+.btn[aria-pressed="true"],
+.btn[aria-expanded="true"],
+.btn[data-feedback="saved"] {
+  background: var(--accent);
+  color: var(--accent-foreground);
+}
+.btn-content {
+  position: relative;
+}
 .unsaved-dot {
-  position: absolute; top: 3px; right: 3px; width: 5px; height: 5px;
-  border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 1px var(--secondary-bg);
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 1px var(--secondary-bg);
 }
 .tooltip {
   @apply fixed z-[1000] pointer-events-none max-w-[calc(100vw-1rem)] break-words rounded-lg bg-secondary-bg text-foreground border border-primary-border text-sm px-3 py-2;
 }
 @media (prefers-reduced-motion: reduce) {
-  .btn { transition: none; }
-  .btn:active { transform: none; }
+  .btn {
+    transition: none;
+  }
+  .btn:active {
+    transform: none;
+  }
 }

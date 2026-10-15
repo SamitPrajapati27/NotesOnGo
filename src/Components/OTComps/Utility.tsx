@@ -1,9 +1,10 @@
 import Toggle from "../MTComps/Toggle";
 import Button from "../MTComps/Button";
-import { PopupController } from "@/src/scripts/setup";
+import { PopupController, saveConfirmationDuration } from "@/src/scripts/setup";
 import { useEffect, useState } from "react";
 type UtilityProps = {
   setExportPopup: PopupController;
+  setImportPopup: PopupController;
   setInfoPopup: PopupController;
   onSave: () => boolean;
   autosave: boolean;
@@ -12,10 +13,11 @@ type UtilityProps = {
 };
 
 /**
- * Render autosave, manual save, export, and help controls with temporary save confirmation.
+ * Render autosave, manual save, export, import, and help controls with temporary save confirmation.
  */
 export default function Utility({
   setExportPopup,
+  setImportPopup,
   setInfoPopup,
   onSave,
   autosave,
@@ -25,7 +27,7 @@ export default function Utility({
   const [confirmation, setConfirmation] = useState(0);
   useEffect(() => {
     if (!confirmation) return;
-    const timer = window.setTimeout(() => setConfirmation(0), 1800);
+    const timer = window.setTimeout(() => setConfirmation(0), saveConfirmationDuration);
     return () => window.clearTimeout(timer);
   }, [confirmation]);
   const saved = confirmation > 0 && !dirty;
@@ -51,6 +53,13 @@ export default function Utility({
         }}
         type="normal"
         tooltip="export"
+        extra="!text-xl btn-full"
+      />
+      <Button
+        icon="material-symbols:download-2-rounded"
+        action={setImportPopup.open}
+        type="normal"
+        tooltip="import"
         extra="!text-xl btn-full"
       />
       <Button
